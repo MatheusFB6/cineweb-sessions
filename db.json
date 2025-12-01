@@ -1,0 +1,36 @@
+{
+  "filmes": [
+    {
+      "titulo": "Homem Aranha",
+      "sinopse": "Ao ser picado por uma aranha geneticamente modificada em uma demonstração científica, o jovem nerd Peter Parker ganha superpoderes. Inicialmente, ele pretende usá-los para ganhar dinheiro, adotando o nome de Homem-Aranha e se apresentando em lutas de exibição. Porém, ao presenciar o assassinato de seu tio Ben e sentir-se culpado, Peter decide não mais usar seus poderes para proveito próprio e sim para enfrentar o mal, tendo como seu primeiro grande desafio o psicótico Duende Verde.",
+      "classificacao": "12",
+      "duracao": 130,
+      "genero": "Aventura",
+      "datasExibicao": "05/12/2025",
+      "id": 1
+    }
+  ],
+  "salas": [
+    {
+      "numero": 1,
+      "capacidade": 50,
+      "id": 1
+    }
+  ],
+  "sessoes": [
+    {
+      "filmeId": 1,
+      "salaId": 1,
+      "dataHora": "2025-12-05T13:30",
+      "id": 1
+    }
+  ],
+  "ingressos": [
+    {
+      "sessaoId": 1,
+      "tipo": "inteira",
+      "valor": 40,
+      "id": 1
+    }
+  ]
+}
