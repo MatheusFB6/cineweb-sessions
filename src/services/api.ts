@@ -1,0 +1,30 @@
+import axios from 'axios';
+import { Filme, Sala, Sessao, Ingresso } from '@/types';
+
+const api = axios.create({
+  baseURL: 'http://localhost:3000',
+});
+
+// Filmes
+export const getFilmes = () => api.get<Filme[]>('/filmes');
+export const createFilme = (filme: Omit<Filme, 'id'>) => api.post<Filme>('/filmes', filme);
+export const deleteFilme = (id: number) => api.delete(`/filmes/${id}`);
+export const getFilme = (id: number) => api.get<Filme>(`/filmes/${id}`);
+
+// Salas
+export const getSalas = () => api.get<Sala[]>('/salas');
+export const createSala = (sala: Omit<Sala, 'id'>) => api.post<Sala>('/salas', sala);
+export const deleteSala = (id: number) => api.delete(`/salas/${id}`);
+
+// Sessoes
+export const getSessoes = () => api.get<Sessao[]>('/sessoes');
+export const createSessao = (sessao: Omit<Sessao, 'id'>) => api.post<Sessao>('/sessoes', sessao);
+export const deleteSessao = (id: number) => api.delete(`/sessoes/${id}`);
+
+// Ingressos
+export const getIngressos = () => api.get<Ingresso[]>('/ingressos');
+export const createIngresso = (ingresso: Omit<Ingresso, 'id'>) => api.post<Ingresso>('/ingressos', ingresso);
+export const getIngressosBySessao = (sessaoId: number) => 
+  api.get<Ingresso[]>(`/ingressos?sessaoId=${sessaoId}`);
+
+export default api;
