@@ -87,39 +87,12 @@ const Index = () => {
           </div>
         </div>
       </section>
-
-      {/* Info Section */}
-      <section className="bg-warning py-4">
-        <div className="container">
-          <div className="row text-center">
-            <div className="col-md-4">
-              <div className="d-flex align-items-center justify-content-center">
-                <i className="bi bi-lightning-fill text-dark fs-3 me-2"></i>
-                <span className="text-dark fw-semibold">API REST com JSON Server</span>
-              </div>
-            </div>
-            <div className="col-md-4">
-              <div className="d-flex align-items-center justify-content-center">
-                <i className="bi bi-shield-check text-dark fs-3 me-2"></i>
-                <span className="text-dark fw-semibold">Validação com Zod</span>
-              </div>
-            </div>
-            <div className="col-md-4">
-              <div className="d-flex align-items-center justify-content-center">
-                <i className="bi bi-grid-fill text-dark fs-3 me-2"></i>
-                <span className="text-dark fw-semibold">Bootstrap Grid System</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* Footer */}
       <footer className="bg-dark text-secondary py-3 border-top border-secondary">
         <div className="container text-center">
           <small>
             <i className="bi bi-code-slash me-1"></i>
-            CineWeb © 2024 - Trabalho Acadêmico - React + TypeScript + Bootstrap
+            CineWeb © 2025 - Trabalho Acadêmico - React + TypeScript + Bootstrap
           </small>
         </div>
       </footer>

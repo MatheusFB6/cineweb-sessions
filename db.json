@@ -31,6 +31,12 @@
       "tipo": "inteira",
       "valor": 40,
       "id": 1
+    },
+    {
+      "sessaoId": 1,
+      "tipo": "meia",
+      "valor": 20,
+      "id": 2
     }
   ]
 }
