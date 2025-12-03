@@ -1,71 +1,100 @@
-# Welcome to your Lovable project
+🎬 CineWeb - Sistema de Gestão de Cinema
 
-## Project info
+Imagem projeto: ![alt text](image.png)
+Projeto acadêmico desenvolvido para a disciplina de Desenvolvimento Web Frontend.
 
-## How can I edit this code?
+O CineWeb é uma aplicação web SPA (Single Page Application) desenvolvida para gerenciar as operações administrativas de um cinema. O sistema permite o cadastro e controle de filmes, salas, agendamento de sessões e simulação de venda de ingressos.
 
-There are several ways of editing your application.
+🚀 Funcionalidades
 
-**Use Lovable**
+🎥 Módulo de Filmes
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/4857210f-d172-4a89-821c-444bb01a1244) and start prompting.
+- Listagem: Visualização de todos os filmes cadastrados em formato de cards.
 
-Changes made via Lovable will be committed automatically to this repo.
+- Cadastro/Edição: Formulário para adicionar novos filmes ou editar existentes (Título, Sinopse, Classificação, Duração, Gênero, Datas).
 
-**Use your preferred IDE**
+- Exclusão: Remoção de filmes do catálogo.
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+🚪 Módulo de Salas
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+- Gerenciamento: Cadastro e listagem de salas com sua respectiva numeração e capacidade máxima.
 
-Follow these steps:
+📅 Módulo de Sessões
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+- Agendamento Inteligente: Criação de sessões cruzando dados de Filmes e Salas existentes.
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+- Listagem Detalhada: Exibição das sessões com dados populados (Nome do filme e Sala real, não apenas IDs).
 
-# Step 3: Install the necessary dependencies.
-npm i
+- Validação: Impede agendamentos com datas retroativas.
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+🎟️ Venda de Ingressos
+
+- Simulação de Venda: Funcionalidade para registrar vendas de ingressos (Inteira ou Meia) vinculadas a uma sessão específica.
+
+🛠️ Tecnologias Utilizadas
+
+O projeto foi construído utilizando as seguintes tecnologias e bibliotecas:
+
+- Core: React + Vite (Template TypeScript)
+- Linguagem: TypeScript
+- Roteamento: React Router DOM
+- Estilização: Bootstrap 5 + Bootstrap Icons
+- Validação de Formulários: Zod
+- API Simulada: Json-Server (Backend Mock)
+- Requisições HTTP: Axios
+
+📦 Como Rodar o Projeto
+
+Siga os passos abaixo para executar o projeto em sua máquina local.
+
+Pré-requisitos
+
+Node.js instalado (versão 16 ou superior recomendada).
+
+Passo a Passo
+
+1. Clone o repositório
+
+git clone <SEU_LINK_DO_GITHUB_AQUI>
+cd cineweb-sessions
+
+
+2. Instale as dependências
+
+npm install
+
+
+3. Inicie o Servidor Backend (Json-Server)
+O projeto precisa que a API simulada esteja rodando para funcionar corretamente.
+
+npm run server
+
+
+O terminal mostrará: Resources: http://localhost:3000/filmes ...
+
+4. Inicie o Frontend (React)
+Em um novo terminal (mantenha o anterior aberto), rode:
+
 npm run dev
-```
 
-**Edit a file directly in GitHub**
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+5. Acesse a aplicação
+Abra seu navegador e vá para o link indicado no terminal (geralmente http://localhost:5173).
 
-**Use GitHub Codespaces**
+📂 Estrutura do Projeto
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+/
+├── public/              # Arquivos estáticos e db.json inicial
+├── src/
+│   ├── components/      # Componentes reutilizáveis (Forms, Listas, Navbar)
+│   ├── pages/           # Páginas principais (Rotas)
+│   ├── schemas/         # Esquemas de validação Zod
+│   ├── services/        # Configuração do Axios e chamadas à API
+│   └── types/           # Interfaces TypeScript
+├── db.json              # Banco de dados simulado (Gerado na raiz ao rodar)
+└── ...config files
 
-## What technologies are used for this project?
 
-This project is built with:
+📝 Autor
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/4857210f-d172-4a89-821c-444bb01a1244) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+Desenvolvido por MatheusFB6 para atividade prática de Frontend.
