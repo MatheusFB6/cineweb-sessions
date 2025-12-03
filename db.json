@@ -8,6 +8,15 @@
       "genero": "Aventura",
       "datasExibicao": "05/12/2025",
       "id": 1
+    },
+    {
+      "titulo": "De volta para o futuro",
+      "sinopse": "O adolescente Marty McFly é transportado para o ano de 1955 quando uma experiência do excêntrico cientista Doc Brown é malsucedida. Marty viaja pelo tempo em um carro modificado e acaba conhecendo seus pais ainda jovens. O problema é que ele pode deixar de existir porque interferiu na rotina dos pais, que correm o risco de não se apaixonarem mais. Para complicar ainda mais a situação, Marty precisa voltar para casa a tempo de salvar o cientista.",
+      "classificacao": "12",
+      "duracao": 116,
+      "genero": "Ficção Científica",
+      "datasExibicao": "06/12/2025",
+      "id": 2
     }
   ],
   "salas": [
@@ -15,6 +24,11 @@
       "numero": 1,
       "capacidade": 50,
       "id": 1
+    },
+    {
+      "numero": 2,
+      "capacidade": 70,
+      "id": 2
     }
   ],
   "sessoes": [
@@ -23,6 +37,12 @@
       "salaId": 1,
       "dataHora": "2025-12-05T14:30",
       "id": 1
+    },
+    {
+      "filmeId": 2,
+      "salaId": 2,
+      "dataHora": "2025-12-06T16:30",
+      "id": 2
     }
   ],
   "ingressos": [
@@ -37,6 +57,12 @@
       "tipo": "meia",
       "valor": 20,
       "id": 2
+    },
+    {
+      "sessaoId": 2,
+      "tipo": "meia",
+      "valor": 20,
+      "id": 3
     }
   ]
 }
