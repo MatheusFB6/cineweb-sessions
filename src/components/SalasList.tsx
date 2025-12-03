@@ -4,9 +4,10 @@ import { deleteSala } from '@/services/api';
 interface SalasListProps {
   salas: Sala[];
   onDelete: () => void;
+  onEdit: (sala: Sala) => void;
 }
 
-const SalasList = ({ salas, onDelete }: SalasListProps) => {
+const SalasList = ({ salas, onDelete, onEdit }: SalasListProps) => {
   const handleDelete = async (id: number) => {
     if (window.confirm('Tem certeza que deseja excluir esta sala?')) {
       try {
@@ -57,13 +58,20 @@ const SalasList = ({ salas, onDelete }: SalasListProps) => {
                 {sala.capacidade} lugares
               </td>
               <td className="text-end">
-                <button
-                  className="btn btn-outline-danger btn-sm"
-                  onClick={() => sala.id && handleDelete(sala.id)}
-                >
-                  <i className="bi bi-trash me-1"></i>
-                  Excluir
-                </button>
+                <div className="btn-group">
+                  <button
+                    className="btn btn-outline-warning btn-sm"
+                    onClick={() => onEdit(sala)}
+                  >
+                    <i className="bi bi-pencil"></i>
+                  </button>
+                  <button
+                    className="btn btn-outline-danger btn-sm"
+                    onClick={() => sala.id && handleDelete(sala.id)}
+                  >
+                    <i className="bi bi-trash"></i>
+                  </button>
+                </div>
               </td>
             </tr>
           ))}

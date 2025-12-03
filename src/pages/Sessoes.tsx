@@ -8,6 +8,7 @@ import { Sessao } from '@/types';
 const Sessoes = () => {
   const [sessoes, setSessoes] = useState<Sessao[]>([]);
   const [loading, setLoading] = useState(true);
+  const [sessaoEditando, setSessaoEditando] = useState<Sessao | null>(null);
 
   const fetchSessoes = async () => {
     try {
@@ -24,6 +25,15 @@ const Sessoes = () => {
     fetchSessoes();
   }, []);
 
+  const handleSuccess = () => {
+    fetchSessoes();
+    setSessaoEditando(null);
+  };
+
+  const handleCancel = () => {
+    setSessaoEditando(null);
+  };
+
   return (
     <div className="min-vh-100 bg-dark">
       <Navbar />
@@ -38,7 +48,11 @@ const Sessoes = () => {
 
         <div className="row">
           <div className="col-12 mb-4">
-            <SessaoForm onSuccess={fetchSessoes} />
+            <SessaoForm 
+              onSuccess={handleSuccess} 
+              sessaoEditando={sessaoEditando}
+              onCancel={handleCancel}
+            />
           </div>
         </div>
 
@@ -60,7 +74,14 @@ const Sessoes = () => {
                 </div>
               </div>
             ) : (
-              <SessoesList sessoes={sessoes} onDelete={fetchSessoes} />
+              <SessoesList 
+                sessoes={sessoes} 
+                onDelete={fetchSessoes} 
+                onEdit={(sessao) => {
+                  setSessaoEditando(sessao);
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                }}
+              />
             )}
           </div>
         </div>

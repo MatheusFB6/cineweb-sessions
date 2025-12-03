@@ -8,6 +8,7 @@ import { Sala } from '@/types';
 const Salas = () => {
   const [salas, setSalas] = useState<Sala[]>([]);
   const [loading, setLoading] = useState(true);
+  const [salaEditando, setSalaEditando] = useState<Sala | null>(null);
 
   const fetchSalas = async () => {
     try {
@@ -24,6 +25,15 @@ const Salas = () => {
     fetchSalas();
   }, []);
 
+  const handleSuccess = () => {
+    fetchSalas();
+    setSalaEditando(null);
+  };
+
+  const handleCancel = () => {
+    setSalaEditando(null);
+  };
+
   return (
     <div className="min-vh-100 bg-dark">
       <Navbar />
@@ -38,7 +48,11 @@ const Salas = () => {
 
         <div className="row">
           <div className="col-lg-6 mb-4">
-            <SalaForm onSuccess={fetchSalas} />
+            <SalaForm 
+              onSuccess={handleSuccess} 
+              salaEditando={salaEditando}
+              onCancel={handleCancel}
+            />
           </div>
           <div className="col-lg-6 mb-4">
             <div className="card bg-dark border-secondary h-100">
@@ -84,7 +98,14 @@ const Salas = () => {
                 </div>
               </div>
             ) : (
-              <SalasList salas={salas} onDelete={fetchSalas} />
+              <SalasList 
+                salas={salas} 
+                onDelete={fetchSalas} 
+                onEdit={(sala) => {
+                  setSalaEditando(sala);
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                }}
+              />
             )}
           </div>
         </div>

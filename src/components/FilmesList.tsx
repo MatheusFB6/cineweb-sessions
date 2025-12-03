@@ -4,9 +4,10 @@ import { deleteFilme } from '@/services/api';
 interface FilmesListProps {
   filmes: Filme[];
   onDelete: () => void;
+  onEdit: (filme: Filme) => void;
 }
 
-const FilmesList = ({ filmes, onDelete }: FilmesListProps) => {
+const FilmesList = ({ filmes, onDelete, onEdit }: FilmesListProps) => {
   const handleDelete = async (id: number) => {
     if (window.confirm('Tem certeza que deseja excluir este filme?')) {
       try {
@@ -68,9 +69,16 @@ const FilmesList = ({ filmes, onDelete }: FilmesListProps) => {
                 {filme.datasExibicao}
               </small>
             </div>
-            <div className="card-footer bg-transparent border-secondary">
+            <div className="card-footer bg-transparent border-secondary d-flex gap-2">
               <button
-                className="btn btn-outline-danger btn-sm w-100"
+                className="btn btn-outline-warning btn-sm w-50"
+                onClick={() => onEdit(filme)}
+              >
+                <i className="bi bi-pencil me-1"></i>
+                Editar
+              </button>
+              <button
+                className="btn btn-outline-danger btn-sm w-50"
                 onClick={() => filme.id && handleDelete(filme.id)}
               >
                 <i className="bi bi-trash me-1"></i>

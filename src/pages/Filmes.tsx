@@ -8,6 +8,7 @@ import { Filme } from '@/types';
 const Filmes = () => {
   const [filmes, setFilmes] = useState<Filme[]>([]);
   const [loading, setLoading] = useState(true);
+  const [filmeEditando, setFilmeEditando] = useState<Filme | null>(null);
 
   const fetchFilmes = async () => {
     try {
@@ -24,6 +25,15 @@ const Filmes = () => {
     fetchFilmes();
   }, []);
 
+  const handleSuccess = () => {
+    fetchFilmes();
+    setFilmeEditando(null);
+  };
+
+  const handleCancel = () => {
+    setFilmeEditando(null);
+  };
+
   return (
     <div className="min-vh-100 bg-dark">
       <Navbar />
@@ -38,7 +48,11 @@ const Filmes = () => {
 
         <div className="row">
           <div className="col-12 mb-4">
-            <FilmeForm onSuccess={fetchFilmes} />
+            <FilmeForm 
+              onSuccess={handleSuccess} 
+              filmeEditando={filmeEditando}
+              onCancel={handleCancel}
+            />
           </div>
         </div>
 
@@ -60,7 +74,14 @@ const Filmes = () => {
                 </div>
               </div>
             ) : (
-              <FilmesList filmes={filmes} onDelete={fetchFilmes} />
+              <FilmesList 
+                filmes={filmes} 
+                onDelete={fetchFilmes} 
+                onEdit={(filme) => {
+                  setFilmeEditando(filme);
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                }}
+              />
             )}
           </div>
         </div>

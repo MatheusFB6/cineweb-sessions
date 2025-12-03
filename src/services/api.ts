@@ -8,17 +8,20 @@ const api = axios.create({
 // Filmes
 export const getFilmes = () => api.get<Filme[]>('/filmes');
 export const createFilme = (filme: Omit<Filme, 'id'>) => api.post<Filme>('/filmes', filme);
+export const updateFilme = (filme: Filme) => api.put<Filme>(`/filmes/${filme.id}`, filme);
 export const deleteFilme = (id: number) => api.delete(`/filmes/${id}`);
 export const getFilme = (id: number) => api.get<Filme>(`/filmes/${id}`);
 
 // Salas
 export const getSalas = () => api.get<Sala[]>('/salas');
 export const createSala = (sala: Omit<Sala, 'id'>) => api.post<Sala>('/salas', sala);
+export const updateSala = (sala: Sala) => api.put<Sala>(`/salas/${sala.id}`, sala);
 export const deleteSala = (id: number) => api.delete(`/salas/${id}`);
 
 // Sessoes
 export const getSessoes = () => api.get<Sessao[]>('/sessoes');
 export const createSessao = (sessao: Omit<Sessao, 'id'>) => api.post<Sessao>('/sessoes', sessao);
+export const updateSessao = (sessao: Sessao) => api.put<Sessao>(`/sessoes/${sessao.id}`, sessao);
 export const deleteSessao = (id: number) => api.delete(`/sessoes/${id}`);
 
 // Ingressos

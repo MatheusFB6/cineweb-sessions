@@ -1,13 +1,15 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { filmeSchema } from '@/schemas/validation';
-import { createFilme } from '@/services/api';
+import { createFilme, updateFilme } from '@/services/api'; // Importe updateFilme
 import { Filme } from '@/types';
 
 interface FilmeFormProps {
   onSuccess: () => void;
+  filmeEditando: Filme | null; // Novo prop
+  onCancel: () => void; // Novo prop para cancelar edição
 }
 
-const FilmeForm = ({ onSuccess }: FilmeFormProps) => {
+const FilmeForm = ({ onSuccess, filmeEditando, onCancel }: FilmeFormProps) => {
   const [formData, setFormData] = useState({
     titulo: '',
     sinopse: '',
@@ -18,6 +20,29 @@ const FilmeForm = ({ onSuccess }: FilmeFormProps) => {
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
+
+  // Efeito para preencher o formulário quando entrar em modo de edição
+  useEffect(() => {
+    if (filmeEditando) {
+      setFormData({
+        titulo: filmeEditando.titulo,
+        sinopse: filmeEditando.sinopse,
+        classificacao: filmeEditando.classificacao,
+        duracao: String(filmeEditando.duracao),
+        genero: filmeEditando.genero,
+        datasExibicao: filmeEditando.datasExibicao,
+      });
+    } else {
+      setFormData({
+        titulo: '',
+        sinopse: '',
+        classificacao: '',
+        duracao: '',
+        genero: '',
+        datasExibicao: '',
+      });
+    }
+  }, [filmeEditando]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -49,7 +74,14 @@ const FilmeForm = ({ onSuccess }: FilmeFormProps) => {
 
     setLoading(true);
     try {
-      await createFilme(result.data as Omit<Filme, 'id'>);
+      if (filmeEditando && filmeEditando.id) {
+        // Modo Edição
+        await updateFilme({ ...result.data, id: filmeEditando.id } as Filme);
+      } else {
+        // Modo Criação
+        await createFilme(result.data as Omit<Filme, 'id'>);
+      }
+      
       setFormData({
         titulo: '',
         sinopse: '',
@@ -60,20 +92,25 @@ const FilmeForm = ({ onSuccess }: FilmeFormProps) => {
       });
       onSuccess();
     } catch (error) {
-      console.error('Erro ao cadastrar filme:', error);
-      alert('Erro ao cadastrar filme. Verifique se o json-server está rodando.');
+      console.error('Erro ao salvar filme:', error);
+      alert('Erro ao salvar filme.');
     } finally {
       setLoading(false);
     }
   };
 
-  return (
+ return (
     <div className="card bg-dark border-secondary">
-      <div className="card-header bg-warning text-dark">
+      <div className="card-header bg-warning text-dark d-flex justify-content-between align-items-center">
         <h5 className="mb-0">
-          <i className="bi bi-plus-circle me-2"></i>
-          Cadastrar Filme
+          <i className={`bi ${filmeEditando ? 'bi-pencil-square' : 'bi-plus-circle'} me-2`}></i>
+          {filmeEditando ? 'Editar Filme' : 'Cadastrar Filme'}
         </h5>
+        {filmeEditando && (
+          <button type="button" className="btn btn-sm btn-outline-dark" onClick={onCancel}>
+            Cancelar Edição
+          </button>
+        )}
       </div>
       <div className="card-body">
         <form onSubmit={handleSubmit}>
@@ -174,19 +211,26 @@ const FilmeForm = ({ onSuccess }: FilmeFormProps) => {
             {errors.sinopse && <div className="invalid-feedback">{errors.sinopse}</div>}
           </div>
 
-          <button type="submit" className="btn btn-warning" disabled={loading}>
-            {loading ? (
-              <>
-                <span className="spinner-border spinner-border-sm me-2"></span>
-                Cadastrando...
-              </>
-            ) : (
-              <>
-                <i className="bi bi-check-lg me-2"></i>
-                Cadastrar Filme
-              </>
+          <div className="d-flex gap-2">
+            <button type="submit" className="btn btn-warning" disabled={loading}>
+              {loading ? (
+                <>
+                  <span className="spinner-border spinner-border-sm me-2"></span>
+                  Salvando...
+                </>
+              ) : (
+                <>
+                  <i className="bi bi-check-lg me-2"></i>
+                  {filmeEditando ? 'Salvar Alterações' : 'Cadastrar Filme'}
+                </>
+              )}
+            </button>
+            {filmeEditando && (
+               <button type="button" className="btn btn-secondary" onClick={onCancel} disabled={loading}>
+                 Cancelar
+               </button>
             )}
-          </button>
+          </div>
         </form>
       </div>
     </div>

@@ -1,13 +1,15 @@
 import { useState, useEffect } from 'react';
 import { sessaoSchema } from '@/schemas/validation';
-import { createSessao, getFilmes, getSalas } from '@/services/api';
+import { createSessao, updateSessao, getFilmes, getSalas } from '@/services/api';
 import { Filme, Sala, Sessao } from '@/types';
 
 interface SessaoFormProps {
   onSuccess: () => void;
+  sessaoEditando: Sessao | null;
+  onCancel: () => void;
 }
 
-const SessaoForm = ({ onSuccess }: SessaoFormProps) => {
+const SessaoForm = ({ onSuccess, sessaoEditando, onCancel }: SessaoFormProps) => {
   const [formData, setFormData] = useState({
     filmeId: '',
     salaId: '',
@@ -30,6 +32,18 @@ const SessaoForm = ({ onSuccess }: SessaoFormProps) => {
     };
     fetchData();
   }, []);
+
+  useEffect(() => {
+    if (sessaoEditando) {
+      setFormData({
+        filmeId: String(sessaoEditando.filmeId),
+        salaId: String(sessaoEditando.salaId),
+        dataHora: sessaoEditando.dataHora,
+      });
+    } else {
+      setFormData({ filmeId: '', salaId: '', dataHora: '' });
+    }
+  }, [sessaoEditando]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -62,7 +76,11 @@ const SessaoForm = ({ onSuccess }: SessaoFormProps) => {
 
     setLoading(true);
     try {
-      await createSessao(result.data as Omit<Sessao, 'id'>);
+      if (sessaoEditando && sessaoEditando.id) {
+        await updateSessao({ ...result.data, id: sessaoEditando.id } as Sessao);
+      } else {
+        await createSessao(result.data as Omit<Sessao, 'id'>);
+      }
       setFormData({ filmeId: '', salaId: '', dataHora: '' });
       onSuccess();
     } catch (error) {
@@ -75,11 +93,16 @@ const SessaoForm = ({ onSuccess }: SessaoFormProps) => {
 
   return (
     <div className="card bg-dark border-secondary">
-      <div className="card-header bg-warning text-dark">
+      <div className="card-header bg-warning text-dark d-flex justify-content-between align-items-center">
         <h5 className="mb-0">
-          <i className="bi bi-plus-circle me-2"></i>
-          Agendar Sessão
+          <i className={`bi ${sessaoEditando ? 'bi-pencil-square' : 'bi-plus-circle'} me-2`}></i>
+          {sessaoEditando ? 'Editar Sessão' : 'Agendar Sessão'}
         </h5>
+        {sessaoEditando && (
+          <button type="button" className="btn btn-sm btn-outline-dark" onClick={onCancel}>
+            Cancelar
+          </button>
+        )}
       </div>
       <div className="card-body">
         <form onSubmit={handleSubmit}>
@@ -145,23 +168,30 @@ const SessaoForm = ({ onSuccess }: SessaoFormProps) => {
             </div>
           </div>
 
-          <button 
-            type="submit" 
-            className="btn btn-warning" 
-            disabled={loading || filmes.length === 0 || salas.length === 0}
-          >
-            {loading ? (
-              <>
-                <span className="spinner-border spinner-border-sm me-2"></span>
-                Agendando...
-              </>
-            ) : (
-              <>
-                <i className="bi bi-check-lg me-2"></i>
-                Agendar Sessão
-              </>
+          <div className="d-flex gap-2">
+            <button 
+              type="submit" 
+              className="btn btn-warning" 
+              disabled={loading || filmes.length === 0 || salas.length === 0}
+            >
+              {loading ? (
+                <>
+                  <span className="spinner-border spinner-border-sm me-2"></span>
+                  Salvando...
+                </>
+              ) : (
+                <>
+                  <i className="bi bi-check-lg me-2"></i>
+                  {sessaoEditando ? 'Salvar Alterações' : 'Agendar Sessão'}
+                </>
+              )}
+            </button>
+            {sessaoEditando && (
+              <button type="button" className="btn btn-secondary" onClick={onCancel} disabled={loading}>
+                Cancelar
+              </button>
             )}
-          </button>
+          </div>
         </form>
       </div>
     </div>

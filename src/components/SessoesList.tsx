@@ -1,14 +1,15 @@
 import { useState, useEffect } from 'react';
-import { Sessao, Filme, Sala, SessaoComDetalhes } from '@/types';
+import { Sessao, SessaoComDetalhes } from '@/types';
 import { deleteSessao, getFilmes, getSalas } from '@/services/api';
 import IngressoModal from './IngressoModal';
 
 interface SessoesListProps {
   sessoes: Sessao[];
   onDelete: () => void;
+  onEdit: (sessao: Sessao) => void;
 }
 
-const SessoesList = ({ sessoes, onDelete }: SessoesListProps) => {
+const SessoesList = ({ sessoes, onDelete, onEdit }: SessoesListProps) => {
   const [sessoesDetalhadas, setSessoesDetalhadas] = useState<SessaoComDetalhes[]>([]);
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedSessao, setSelectedSessao] = useState<SessaoComDetalhes | null>(null);
@@ -131,6 +132,12 @@ const SessoesList = ({ sessoes, onDelete }: SessoesListProps) => {
                     >
                       <i className="bi bi-ticket-perforated me-1"></i>
                       Vender Ingresso
+                    </button>
+                    <button
+                      className="btn btn-outline-warning btn-sm"
+                      onClick={() => onEdit(sessao)}
+                    >
+                      <i className="bi bi-pencil"></i>
                     </button>
                     <button
                       className="btn btn-outline-danger btn-sm"
