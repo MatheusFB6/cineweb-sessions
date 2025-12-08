@@ -5,6 +5,7 @@ import Index from './pages/Index';
 import Filmes from './pages/Filmes';
 import Salas from './pages/Salas';
 import Sessoes from './pages/Sessoes';
+import Lanches from './pages/Lanches';
 import NotFound from './pages/NotFound';
 
 const App = () => (
@@ -14,6 +15,7 @@ const App = () => (
       <Route path="/filmes" element={<Filmes />} />
       <Route path="/salas" element={<Salas />} />
       <Route path="/sessoes" element={<Sessoes />} />
+      <Route path="/lanches" element={<Lanches />} />
       <Route path="*" element={<NotFound />} />
     </Routes>
   </BrowserRouter>

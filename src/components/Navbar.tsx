@@ -25,39 +25,28 @@ const Navbar = () => {
         <div className="collapse navbar-collapse" id="navbarNav">
           <ul className="navbar-nav ms-auto">
             <li className="nav-item">
-              <Link
-                to="/"
-                className={`nav-link ${isActive('/') ? 'active text-warning' : ''}`}
-              >
-                <i className="bi bi-house-door me-1"></i>
-                Início
+              <Link to="/" className={`nav-link ${isActive('/') ? 'active text-warning' : ''}`}>
+                <i className="bi bi-house-door me-1"></i> Início
               </Link>
             </li>
             <li className="nav-item">
-              <Link
-                to="/filmes"
-                className={`nav-link ${isActive('/filmes') ? 'active text-warning' : ''}`}
-              >
-                <i className="bi bi-camera-reels me-1"></i>
-                Filmes
+              <Link to="/filmes" className={`nav-link ${isActive('/filmes') ? 'active text-warning' : ''}`}>
+                <i className="bi bi-camera-reels me-1"></i> Filmes
               </Link>
             </li>
             <li className="nav-item">
-              <Link
-                to="/salas"
-                className={`nav-link ${isActive('/salas') ? 'active text-warning' : ''}`}
-              >
-                <i className="bi bi-door-open me-1"></i>
-                Salas
+              <Link to="/salas" className={`nav-link ${isActive('/salas') ? 'active text-warning' : ''}`}>
+                <i className="bi bi-door-open me-1"></i> Salas
               </Link>
             </li>
             <li className="nav-item">
-              <Link
-                to="/sessoes"
-                className={`nav-link ${isActive('/sessoes') ? 'active text-warning' : ''}`}
-              >
-                <i className="bi bi-calendar-event me-1"></i>
-                Sessões
+              <Link to="/sessoes" className={`nav-link ${isActive('/sessoes') ? 'active text-warning' : ''}`}>
+                <i className="bi bi-calendar-event me-1"></i> Sessões
+              </Link>
+            </li>
+            <li className="nav-item">
+              <Link to="/lanches" className={`nav-link ${isActive('/lanches') ? 'active text-warning' : ''}`}>
+                <i className="bi bi-cup-straw me-1"></i> Lanches
               </Link>
             </li>
           </ul>

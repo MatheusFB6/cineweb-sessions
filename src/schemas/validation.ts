@@ -24,12 +24,15 @@ export const sessaoSchema = z.object({
   }, 'A data não pode ser retroativa'),
 });
 
-export const ingressoSchema = z.object({
-  sessaoId: z.number().positive(),
-  tipo: z.enum(['inteira', 'meia']),
+export const lancheSchema = z.object({
+  nome: z.string().min(3, 'Nome deve ter no mínimo 3 caracteres'),
+  descricao: z.string().min(5, 'Descrição deve ter no mínimo 5 caracteres'),
+  valorUnitario: z.number().positive('Valor deve ser positivo'),
+  qtUnidade: z.number().int().nonnegative('Quantidade deve ser 0 ou maior'),
 });
 
+// Tipos inferidos
 export type FilmeFormData = z.infer<typeof filmeSchema>;
 export type SalaFormData = z.infer<typeof salaSchema>;
 export type SessaoFormData = z.infer<typeof sessaoSchema>;
-export type IngressoFormData = z.infer<typeof ingressoSchema>;
+export type LancheFormData = z.infer<typeof lancheSchema>;

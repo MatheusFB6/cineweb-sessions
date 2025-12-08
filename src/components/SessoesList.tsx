@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Sessao, SessaoComDetalhes } from '@/types';
 import { deleteSessao, getFilmes, getSalas } from '@/services/api';
-import IngressoModal from './IngressoModal';
+import PedidoModal from './PedidoModal';
 
 interface SessoesListProps {
   sessoes: Sessao[];
@@ -153,7 +153,7 @@ const SessoesList = ({ sessoes, onDelete, onEdit }: SessoesListProps) => {
         </table>
       </div>
 
-      <IngressoModal
+      <PedidoModal
         isOpen={modalOpen}
         onClose={() => setModalOpen(false)}
         sessao={selectedSessao}

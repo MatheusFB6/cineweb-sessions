@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { Filme, Sala, Sessao, Ingresso } from '@/types';
+import { Filme, Sala, Sessao, Ingresso, LancheCombo, Pedido } from '@/types';
 
 const api = axios.create({
   baseURL: 'http://localhost:3000',
@@ -24,10 +24,19 @@ export const createSessao = (sessao: Omit<Sessao, 'id'>) => api.post<Sessao>('/s
 export const updateSessao = (sessao: Sessao) => api.put<Sessao>(`/sessoes/${sessao.id}`, sessao);
 export const deleteSessao = (id: number) => api.delete(`/sessoes/${id}`);
 
-// Ingressos
+// Ingressos (Mantido para compatibilidade, mas o foco é Pedido)
 export const getIngressos = () => api.get<Ingresso[]>('/ingressos');
 export const createIngresso = (ingresso: Omit<Ingresso, 'id'>) => api.post<Ingresso>('/ingressos', ingresso);
 export const getIngressosBySessao = (sessaoId: number) => 
   api.get<Ingresso[]>(`/ingressos?sessaoId=${sessaoId}`);
+
+// Lanches
+export const getLanches = () => api.get<LancheCombo[]>('/lanches');
+export const createLanche = (lanche: Omit<LancheCombo, 'id'>) => api.post<LancheCombo>('/lanches', lanche);
+export const updateLanche = (lanche: LancheCombo) => api.put<LancheCombo>(`/lanches/${lanche.id}`, lanche);
+export const deleteLanche = (id: number) => api.delete(`/lanches/${id}`);
+
+// Pedidos
+export const createPedido = (pedido: Omit<Pedido, 'id'>) => api.post<Pedido>('/pedidos', pedido);
 
 export default api;

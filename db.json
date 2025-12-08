@@ -2,21 +2,12 @@
   "filmes": [
     {
       "titulo": "Homem Aranha",
-      "sinopse": "Ao ser picado por uma aranha geneticamente modificada em uma demonstração científica, o jovem nerd Peter Parker ganha superpoderes. Inicialmente, ele pretende usá-los para ganhar dinheiro, adotando o nome de Homem-Aranha e se apresentando em lutas de exibição. Porém, ao presenciar o assassinato de seu tio Ben e sentir-se culpado, Peter decide não mais usar seus poderes para proveito próprio e sim para enfrentar o mal, tendo como seu primeiro grande desafio o psicótico Duende Verde.\n",
+      "sinopse": "Homem que foi picado por uma aranha.",
       "classificacao": "12",
-      "duracao": 130,
-      "genero": "Aventura",
-      "datasExibicao": "05/12/2025",
+      "duracao": 120,
+      "genero": "Ação",
+      "datasExibicao": "08/12/2025",
       "id": 1
-    },
-    {
-      "titulo": "De volta para o futuro",
-      "sinopse": "O adolescente Marty McFly é transportado para o ano de 1955 quando uma experiência do excêntrico cientista Doc Brown é malsucedida. Marty viaja pelo tempo em um carro modificado e acaba conhecendo seus pais ainda jovens. O problema é que ele pode deixar de existir porque interferiu na rotina dos pais, que correm o risco de não se apaixonarem mais. Para complicar ainda mais a situação, Marty precisa voltar para casa a tempo de salvar o cientista.",
-      "classificacao": "12",
-      "duracao": 116,
-      "genero": "Ficção Científica",
-      "datasExibicao": "06/12/2025",
-      "id": 2
     }
   ],
   "salas": [
@@ -24,45 +15,97 @@
       "numero": 1,
       "capacidade": 50,
       "id": 1
-    },
-    {
-      "numero": 2,
-      "capacidade": 70,
-      "id": 2
     }
   ],
   "sessoes": [
     {
       "filmeId": 1,
       "salaId": 1,
-      "dataHora": "2025-12-05T14:30",
+      "dataHora": "2025-12-08T14:30",
       "id": 1
-    },
-    {
-      "filmeId": 2,
-      "salaId": 2,
-      "dataHora": "2025-12-06T16:30",
-      "id": 2
     }
   ],
-  "ingressos": [
+  "lanches": [
     {
-      "sessaoId": 1,
-      "tipo": "inteira",
-      "valor": 40,
-      "id": 1
+      "id": 1,
+      "nome": "Pipoca Grande",
+      "descricao": "Pipoca salgada na manteiga",
+      "valorUnitario": 15,
+      "qtUnidade": 100,
+      "subtotal": 0
     },
     {
-      "sessaoId": 1,
-      "tipo": "meia",
-      "valor": 20,
-      "id": 2
+      "id": 2,
+      "nome": "Refrigerante 500ml",
+      "descricao": "Coca-cola ou Guaraná",
+      "valorUnitario": 8,
+      "qtUnidade": 200,
+      "subtotal": 0
     },
     {
-      "sessaoId": 2,
-      "tipo": "meia",
-      "valor": 20,
-      "id": 3
+      "id": 3,
+      "nome": "Combo Pipoca Média com Refrigerante 500ml",
+      "descricao": "Pipoca Média e Coca-cola ou Guaraná",
+      "valorUnitario": 17,
+      "qtUnidade": 50,
+      "subtotal": 0
     }
-  ]
+  ],
+  "pedidos": [
+    {
+      "qtInteira": 3,
+      "qtMeia": 1,
+      "ingressos": [
+        {
+          "sessaoId": 1,
+          "tipo": "inteira",
+          "valor": 40
+        },
+        {
+          "sessaoId": 1,
+          "tipo": "inteira",
+          "valor": 40
+        },
+        {
+          "sessaoId": 1,
+          "tipo": "inteira",
+          "valor": 40
+        },
+        {
+          "sessaoId": 1,
+          "tipo": "meia",
+          "valor": 20
+        }
+      ],
+      "lanches": [
+        {
+          "id": 3,
+          "nome": "Combo Pipoca Média com Refrigerante 500ml",
+          "descricao": "Pipoca Média e Coca-cola ou Guaraná",
+          "valorUnitario": 17,
+          "qtUnidade": 1,
+          "subtotal": 17
+        },
+        {
+          "id": 2,
+          "nome": "Refrigerante 500ml",
+          "descricao": "Coca-cola ou Guaraná",
+          "valorUnitario": 8,
+          "qtUnidade": 1,
+          "subtotal": 8
+        },
+        {
+          "id": 1,
+          "nome": "Pipoca Grande",
+          "descricao": "Pipoca salgada na manteiga",
+          "valorUnitario": 15,
+          "qtUnidade": 1,
+          "subtotal": 15
+        }
+      ],
+      "valorTotal": 180,
+      "id": 1
+    }
+  ],
+  "ingressos": []
 }

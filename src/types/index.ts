@@ -28,6 +28,24 @@ export interface Ingresso {
   valor: number;
 }
 
+export interface LancheCombo {
+  id?: number;
+  nome: string;
+  descricao: string;
+  valorUnitario: number;
+  qtUnidade: number; // Estoque ou quantidade no item
+  subtotal: number; // Usado para cálculo no pedido
+}
+
+export interface Pedido {
+  id?: number;
+  qtInteira: number;
+  qtMeia: number;
+  ingressos: Ingresso[];
+  lanches: LancheCombo[]; // No pedido, representa os itens comprados
+  valorTotal: number;
+}
+
 export interface SessaoComDetalhes extends Sessao {
   filme?: Filme;
   sala?: Sala;
