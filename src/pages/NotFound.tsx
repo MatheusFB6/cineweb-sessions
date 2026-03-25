@@ -1,10 +1,8 @@
 import { Link } from 'react-router-dom';
-import Navbar from '@/components/Navbar';
 
 const NotFound = () => {
   return (
-    <div className="min-vh-100 bg-dark">
-      <Navbar />
+    <>
       <div className="container d-flex align-items-center justify-content-center" style={{ minHeight: 'calc(100vh - 76px)' }}>
         <div className="text-center">
           <i className="bi bi-exclamation-triangle text-warning display-1 mb-4"></i>
@@ -18,7 +16,7 @@ const NotFound = () => {
           </Link>
         </div>
       </div>
-    </div>
+    </>
   );
 };
 

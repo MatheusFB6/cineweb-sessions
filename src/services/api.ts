@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { Filme, Sala, Sessao, LancheCombo, Pedido } from '../types'; // Ajuste o caminho dos types se necessário
+import { Filme, Sala, Sessao, LancheCombo, Pedido, Address } from '../types';
 
 // 1. Configuração Base da API
 export const api = axios.create({
@@ -20,6 +20,20 @@ api.interceptors.request.use(
   }
 );
 
+// Interceptor de Resposta (Para pegar os erros do ValidationPipe)
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 400 && error.response?.data?.message) {
+      const msgs = Array.isArray(error.response.data.message)
+        ? error.response.data.message.join('\n')
+        : error.response.data.message;
+      alert(`Validação recusada pelo Backend:\n${msgs}`);
+    }
+    return Promise.reject(error);
+  }
+);
+
 // ==========================================
 // FUNÇÕES DE FILMES
 // ==========================================
@@ -34,7 +48,9 @@ export const createFilme = async (filme: Omit<Filme, 'id'>) => {
 };
 
 export const updateFilme = async (id: number, filme: Partial<Filme>) => {
-  const response = await api.patch<Filme>(`/filmes/${id}`, filme);
+  const payload = { ...filme };
+  delete payload.id;
+  const response = await api.put<Filme>(`/filmes/${id}`, payload);
   return response.data;
 };
 
@@ -56,7 +72,9 @@ export const createSala = async (sala: Omit<Sala, 'id'>) => {
 };
 
 export const updateSala = async (id: number, sala: Partial<Sala>) => {
-  const response = await api.patch<Sala>(`/salas/${id}`, sala);
+  const payload = { ...sala };
+  delete payload.id;
+  const response = await api.put<Sala>(`/salas/${id}`, payload);
   return response.data;
 };
 
@@ -78,7 +96,9 @@ export const createSessao = async (sessao: Omit<Sessao, 'id'>) => {
 };
 
 export const updateSessao = async (id: number, sessao: Partial<Sessao>) => {
-  const response = await api.patch<Sessao>(`/sessoes/${id}`, sessao);
+  const payload = { ...sessao };
+  delete payload.id;
+  const response = await api.put<Sessao>(`/sessoes/${id}`, payload);
   return response.data;
 };
 
@@ -100,7 +120,9 @@ export const createLanche = async (lanche: Omit<LancheCombo, 'id'>) => {
 };
 
 export const updateLanche = async (id: number, lanche: Partial<LancheCombo>) => {
-  const response = await api.patch<LancheCombo>(`/lanches/${id}`, lanche);
+  const payload = { ...lanche };
+  delete payload.id;
+  const response = await api.put<LancheCombo>(`/lanches/${id}`, payload);
   return response.data;
 };
 
@@ -113,5 +135,25 @@ export const deleteLanche = async (id: number) => {
 // ==========================================
 export const createPedido = async (pedido: Pedido) => {
   const response = await api.post('/pedidos', pedido);
+  return response.data;
+};
+
+// ==========================================
+// FUNÇÕES DE USUÁRIO / AUTENTICAÇÃO
+// ==========================================
+export interface RegisterData {
+  name?: string;
+  email: string;
+  password?: string;
+  profileId?: number;
+}
+
+export const registerUser = async (userData: RegisterData) => {
+  const response = await api.post('/user', userData);
+  return response.data;
+};
+
+export const createAddress = async (addressData: Partial<Address>) => {
+  const response = await api.post('/address', addressData);
   return response.data;
 };

@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import Navbar from '@/components/Navbar';
 import SalaForm from '@/components/SalaForm';
 import SalasList from '@/components/SalasList';
 import { getSalas } from '@/services/api';
@@ -13,7 +12,7 @@ const Salas = () => {
   const fetchSalas = async () => {
     try {
       const response = await getSalas();
-      setSalas(response.data);
+      setSalas(response);
     } catch (error) {
       console.error('Erro ao carregar salas:', error);
     } finally {
@@ -35,8 +34,7 @@ const Salas = () => {
   };
 
   return (
-    <div className="min-vh-100 bg-dark">
-      <Navbar />
+    <>
       <div className="container py-4">
         <div className="d-flex align-items-center mb-4">
           <i className="bi bi-door-open text-warning display-5 me-3"></i>
@@ -110,7 +108,7 @@ const Salas = () => {
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 };
 

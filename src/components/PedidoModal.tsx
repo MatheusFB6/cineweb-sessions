@@ -67,25 +67,18 @@ const PedidoModal = ({ isOpen, onClose, sessao }: PedidoModalProps) => {
       // Montar lista de objetos Ingresso conforme diagrama
       const listaIngressos: Ingresso[] = [];
       for (let i = 0; i < qtInteira; i++) {
-        listaIngressos.push({ sessaoId: sessao.id!, tipo: 'inteira', valor: PRECO_INTEIRA });
+        listaIngressos.push({ sessaoId: sessao.id!, tipo: 'Inteira', valor: PRECO_INTEIRA });
       }
       for (let i = 0; i < qtMeia; i++) {
-        listaIngressos.push({ sessaoId: sessao.id!, tipo: 'meia', valor: PRECO_MEIA });
+        listaIngressos.push({ sessaoId: sessao.id!, tipo: 'Meia', valor: PRECO_MEIA });
       }
 
-      // Montar lista de Lanches conforme diagrama (Agregados ao pedido)
-      // Aqui simplificamos: criamos um objeto LancheCombo para cada unidade comprada para ficar na lista do Pedido
-      const listaLanchesPedido: LancheCombo[] = [];
-      lanchesSelecionados.forEach(item => {
-        for(let i=0; i < item.qtd; i++) {
-           // Copia o lanche e ajusta subtotal e unidade para representar o item no pedido
-           listaLanchesPedido.push({
-             ...item.lanche,
-             qtUnidade: 1, 
-             subtotal: item.lanche.valorUnitario
-           });
-        }
-      });
+      // Montar lista de Lanches conforme formato exigido pelo backend
+      const listaLanchesPedido = lanchesSelecionados.map(item => ({
+        id: item.lanche.id!,
+        qtUnidade: item.qtd,
+        subtotal: item.lanche.valorUnitario * item.qtd
+      }));
 
       const novoPedido: Omit<Pedido, 'id'> = {
         qtInteira,

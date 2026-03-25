@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import Navbar from '@/components/Navbar';
 import SessaoForm from '@/components/SessaoForm';
 import SessoesList from '@/components/SessoesList';
 import { getSessoes } from '@/services/api';
@@ -39,8 +38,7 @@ const Sessoes = () => {
   };
 
   return (
-    <div className="min-vh-100 bg-dark">
-      <Navbar />
+    <>
       <div className="container py-4">
         <div className="d-flex align-items-center mb-4">
           <i className="bi bi-calendar-event text-warning display-5 me-3"></i>
@@ -93,7 +91,7 @@ const Sessoes = () => {
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 };
 

@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import Navbar from '@/components/Navbar';
 import LancheForm from '@/components/LancheForm';
 import LanchesList from '@/components/LanchesList';
 import { getLancheCombos as getLanches } from '@/services/api';
@@ -39,8 +38,7 @@ const Lanches = () => {
   };
 
   return (
-    <div className="min-vh-100 bg-dark">
-      <Navbar />
+    <>
       <div className="container py-4">
         <div className="d-flex align-items-center mb-4">
           <i className="bi bi-cup-straw text-warning display-5 me-3"></i>
@@ -93,7 +91,7 @@ const Lanches = () => {
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 };
 

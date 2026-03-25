@@ -7,15 +7,18 @@ import './index.css';
 // 1. Importe o AuthProvider que acabamos de criar
 import { AuthProvider } from './contexts/AuthContext.tsx'; 
 
+import { BrowserRouter } from 'react-router-dom';
+
 const queryClient = new QueryClient();
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <QueryClientProvider client={queryClient}>
-      {/* 2. Envolva o App com o AuthProvider */}
-      <AuthProvider>
-        <App />
-      </AuthProvider>
+      <BrowserRouter>
+        <AuthProvider>
+          <App />
+        </AuthProvider>
+      </BrowserRouter>
     </QueryClientProvider>
   </StrictMode>
 );

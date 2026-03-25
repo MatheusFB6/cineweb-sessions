@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { api } from '../services/api';
 import { useAuth } from '../contexts/AuthContext';
 
@@ -24,12 +24,10 @@ export default function Login() {
       const token = authResponse.data.access_token;
 
       // 2. Decodifica o payload do JWT para pegar o ID do usuário (sub)
-      // O atob decodifica a base64 do token
       const payload = JSON.parse(atob(token.split('.')[1]));
       const userId = payload.sub;
 
-      // 3. Busca as informações completas do usuário (Nome, Perfil, etc)
-      // Passamos o header manualmente aqui pois o interceptor ainda não "sabe" do token
+      // 3. Busca as informações completas do usuário
       const userResponse = await api.get(`/user/${userId}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -37,73 +35,91 @@ export default function Login() {
       // 4. Salva no contexto e no localStorage
       signIn(token, userResponse.data);
 
-      // 5. Redireciona para a página de Filmes (Página inicial)
-      navigate('/filmes');
+      // 5. Redireciona com base no perfil
+      if (userResponse.data.profileId === 1) {
+        navigate('/admin/dashboard');
+      } else {
+        navigate('/filmes');
+      }
     } catch (err: unknown) {
-          const errorMessage = axios.isAxiosError(err) 
-            ? err.response?.data?.message 
-            : 'Erro ao fazer login. Verifique se o email e senha estão corretos.';
-          setError(
-            errorMessage || 'Erro ao fazer login. Verifique se o email e senha estão corretos.');
-        } finally {
-          setIsLoading(false);
-        }
-      };
+      const errorMessage = axios.isAxiosError(err) 
+        ? err.response?.data?.message 
+        : 'Erro ao fazer login. Verifique se o e-mail e senha estão corretos.';
+      setError(errorMessage || 'Erro ao fazer login. Verifique se o e-mail e senha estão corretos.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
-    <div className="min-h-[80vh] flex items-center justify-center">
-      <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
-        <h2 className="text-2xl font-bold text-center text-gray-800 mb-6">
-          Acesso ao Sistema
-        </h2>
-
-        {error && (
-          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-            {error}
-          </div>
-        )}
-
-        <form onSubmit={handleLogin} className="space-y-4">
-          <div>
-            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="email">
-              E-mail
-            </label>
-            <input
-              id="email"
-              type="email"
-              required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="exemplo@cinema.com"
-            />
+    <div className="d-flex align-items-center justify-content-center min-vh-100 bg-dark py-5">
+      <div className="card shadow-lg p-4 w-100 bg-black border border-warning" style={{ maxWidth: '420px', borderRadius: '1rem' }}>
+        <div className="card-body">
+          <div className="text-center mb-4">
+            <i className="bi bi-person-circle text-warning display-4"></i>
+            <h2 className="text-warning fw-bold mt-2" style={{ letterSpacing: '-0.5px' }}>
+              Acesso Segurado
+            </h2>
+            <p className="text-secondary small mt-1">Insira suas credenciais para entrar</p>
           </div>
 
-          <div>
-            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="password">
-              Senha
-            </label>
-            <input
-              id="password"
-              type="password"
-              required
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="********"
-            />
-          </div>
+          {error && (
+            <div className="alert alert-danger border-danger text-danger bg-dark" role="alert">
+              <i className="bi bi-exclamation-triangle-fill me-2"></i>
+              {error}
+            </div>
+          )}
 
-          <button
-            type="submit"
-            disabled={isLoading}
-            className={`w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline transition-colors ${
-              isLoading ? 'opacity-50 cursor-not-allowed' : ''
-            }`}
-          >
-            {isLoading ? 'Entrando...' : 'Entrar'}
-          </button>
-        </form>
+          <form onSubmit={handleLogin} className="d-flex flex-column gap-3 mt-4">
+            <div className="form-floating">
+              <input
+                id="email"
+                type="email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="form-control bg-dark text-light border-secondary focus-ring focus-ring-warning"
+                placeholder="exemplo@cinema.com"
+              />
+              <label htmlFor="email" className="text-secondary">E-mail</label>
+            </div>
+
+            <div className="form-floating">
+              <input
+                id="password"
+                type="password"
+                required
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="form-control bg-dark text-light border-secondary focus-ring focus-ring-warning"
+                placeholder="********"
+              />
+              <label htmlFor="password" className="text-secondary">Senha</label>
+            </div>
+
+            <button
+              type="submit"
+              disabled={isLoading}
+              className={`btn btn-warning py-3 fw-bold mt-3 text-dark border-0 shadow ${isLoading ? 'disabled opacity-75' : ''}`}
+              style={{ borderRadius: '0.5rem' }}
+            >
+              {isLoading ? (
+                <>
+                  <span className="spinner-border spinner-border-sm me-2 text-dark" role="status" aria-hidden="true"></span>
+                  Entrando...
+                </>
+              ) : 'Acessar Plataforma'}
+            </button>
+          </form>
+
+          <div className="text-center mt-4">
+            <span className="text-light small">Não tem uma conta? </span>
+            <Link to="/register" className="text-warning fw-bold text-decoration-none border-bottom border-warning pb-1">
+              Cadastre-se agora
+            </Link>
+          </div>
+          
+        </div>
       </div>
     </div>
   );

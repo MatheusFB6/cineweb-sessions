@@ -100,3 +100,8 @@ All colors MUST be HSL.
     @apply bg-background text-foreground;
   }
 }
+
+.nav-link.hover-warning:hover,
+.nav-link.hover-warning.active {
+  color: #ffc107 !important;
+}

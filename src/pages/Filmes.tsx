@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import Navbar from '@/components/Navbar';
 import FilmeForm from '@/components/FilmeForm';
 import FilmesList from '@/components/FilmesList';
 import { getFilmes } from '@/services/api';
@@ -38,8 +37,7 @@ const Filmes = () => {
   };
 
   return (
-    <div className="min-vh-100 bg-dark">
-      <Navbar />
+    <>
       <div className="container py-4">
         <div className="d-flex align-items-center mb-4">
           <i className="bi bi-camera-reels text-warning display-5 me-3"></i>
@@ -92,7 +90,7 @@ const Filmes = () => {
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 };
 
