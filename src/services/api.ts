@@ -1,42 +1,117 @@
 import axios from 'axios';
-import { Filme, Sala, Sessao, Ingresso, LancheCombo, Pedido } from '@/types';
+import { Filme, Sala, Sessao, LancheCombo, Pedido } from '../types'; // Ajuste o caminho dos types se necessário
 
-const api = axios.create({
+// 1. Configuração Base da API
+export const api = axios.create({
   baseURL: 'http://localhost:3000',
 });
 
-// Filmes
-export const getFilmes = () => api.get<Filme[]>('/filmes');
-export const createFilme = (filme: Omit<Filme, 'id'>) => api.post<Filme>('/filmes', filme);
-export const updateFilme = (filme: Filme) => api.put<Filme>(`/filmes/${filme.id}`, filme);
-export const deleteFilme = (id: number) => api.delete(`/filmes/${id}`);
-export const getFilme = (id: number) => api.get<Filme>(`/filmes/${id}`);
+// 2. Interceptor de Autenticação (O "Pedágio" do JWT)
+api.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem('@Cineweb:token');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
 
-// Salas
-export const getSalas = () => api.get<Sala[]>('/salas');
-export const createSala = (sala: Omit<Sala, 'id'>) => api.post<Sala>('/salas', sala);
-export const updateSala = (sala: Sala) => api.put<Sala>(`/salas/${sala.id}`, sala);
-export const deleteSala = (id: number) => api.delete(`/salas/${id}`);
+// ==========================================
+// FUNÇÕES DE FILMES
+// ==========================================
+export const getFilmes = async () => {
+  const response = await api.get<Filme[]>('/filmes');
+  return response.data;
+};
 
-// Sessoes
-export const getSessoes = () => api.get<Sessao[]>('/sessoes');
-export const createSessao = (sessao: Omit<Sessao, 'id'>) => api.post<Sessao>('/sessoes', sessao);
-export const updateSessao = (sessao: Sessao) => api.put<Sessao>(`/sessoes/${sessao.id}`, sessao);
-export const deleteSessao = (id: number) => api.delete(`/sessoes/${id}`);
+export const createFilme = async (filme: Omit<Filme, 'id'>) => {
+  const response = await api.post<Filme>('/filmes', filme);
+  return response.data;
+};
 
-// Ingressos (Mantido para compatibilidade, mas o foco é Pedido)
-export const getIngressos = () => api.get<Ingresso[]>('/ingressos');
-export const createIngresso = (ingresso: Omit<Ingresso, 'id'>) => api.post<Ingresso>('/ingressos', ingresso);
-export const getIngressosBySessao = (sessaoId: number) => 
-  api.get<Ingresso[]>(`/ingressos?sessaoId=${sessaoId}`);
+export const updateFilme = async (id: number, filme: Partial<Filme>) => {
+  const response = await api.patch<Filme>(`/filmes/${id}`, filme);
+  return response.data;
+};
 
-// Lanches
-export const getLanches = () => api.get<LancheCombo[]>('/lanches');
-export const createLanche = (lanche: Omit<LancheCombo, 'id'>) => api.post<LancheCombo>('/lanches', lanche);
-export const updateLanche = (lanche: LancheCombo) => api.put<LancheCombo>(`/lanches/${lanche.id}`, lanche);
-export const deleteLanche = (id: number) => api.delete(`/lanches/${id}`);
+export const deleteFilme = async (id: number) => {
+  await api.delete(`/filmes/${id}`);
+};
 
-// Pedidos
-export const createPedido = (pedido: Omit<Pedido, 'id'>) => api.post<Pedido>('/pedidos', pedido);
+// ==========================================
+// FUNÇÕES DE SALAS
+// ==========================================
+export const getSalas = async () => {
+  const response = await api.get<Sala[]>('/salas');
+  return response.data;
+};
 
-export default api;
+export const createSala = async (sala: Omit<Sala, 'id'>) => {
+  const response = await api.post<Sala>('/salas', sala);
+  return response.data;
+};
+
+export const updateSala = async (id: number, sala: Partial<Sala>) => {
+  const response = await api.patch<Sala>(`/salas/${id}`, sala);
+  return response.data;
+};
+
+export const deleteSala = async (id: number) => {
+  await api.delete(`/salas/${id}`);
+};
+
+// ==========================================
+// FUNÇÕES DE SESSÕES
+// ==========================================
+export const getSessoes = async () => {
+  const response = await api.get<Sessao[]>('/sessoes');
+  return response.data;
+};
+
+export const createSessao = async (sessao: Omit<Sessao, 'id'>) => {
+  const response = await api.post<Sessao>('/sessoes', sessao);
+  return response.data;
+};
+
+export const updateSessao = async (id: number, sessao: Partial<Sessao>) => {
+  const response = await api.patch<Sessao>(`/sessoes/${id}`, sessao);
+  return response.data;
+};
+
+export const deleteSessao = async (id: number) => {
+  await api.delete(`/sessoes/${id}`);
+};
+
+// ==========================================
+// FUNÇÕES DE LANCHES
+// ==========================================
+export const getLancheCombos = async () => {
+  const response = await api.get<LancheCombo[]>('/lanches');
+  return response.data;
+};
+
+export const createLanche = async (lanche: Omit<LancheCombo, 'id'>) => {
+  const response = await api.post<LancheCombo>('/lanches', lanche);
+  return response.data;
+};
+
+export const updateLanche = async (id: number, lanche: Partial<LancheCombo>) => {
+  const response = await api.patch<LancheCombo>(`/lanches/${id}`, lanche);
+  return response.data;
+};
+
+export const deleteLanche = async (id: number) => {
+  await api.delete(`/lanches/${id}`);
+};
+
+// ==========================================
+// FUNÇÕES DE PEDIDOS
+// ==========================================
+export const createPedido = async (pedido: Pedido) => {
+  const response = await api.post('/pedidos', pedido);
+  return response.data;
+};

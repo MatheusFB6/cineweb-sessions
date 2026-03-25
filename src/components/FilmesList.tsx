@@ -1,5 +1,7 @@
 import { Filme } from '@/types';
 import { deleteFilme } from '@/services/api';
+// 1. Importando o nosso hook de autenticação
+import { useAuth } from '../contexts/AuthContext'; 
 
 interface FilmesListProps {
   filmes: Filme[];
@@ -8,6 +10,9 @@ interface FilmesListProps {
 }
 
 const FilmesList = ({ filmes, onDelete, onEdit }: FilmesListProps) => {
+  // 2. Extraindo a variável que nos diz se o usuário é administrador
+  const { isAdmin } = useAuth(); 
+
   const handleDelete = async (id: number) => {
     if (window.confirm('Tem certeza que deseja excluir este filme?')) {
       try {
@@ -69,22 +74,27 @@ const FilmesList = ({ filmes, onDelete, onEdit }: FilmesListProps) => {
                 {filme.datasExibicao}
               </small>
             </div>
-            <div className="card-footer bg-transparent border-secondary d-flex gap-2">
-              <button
-                className="btn btn-outline-warning btn-sm w-50"
-                onClick={() => onEdit(filme)}
-              >
-                <i className="bi bi-pencil me-1"></i>
-                Editar
-              </button>
-              <button
-                className="btn btn-outline-danger btn-sm w-50"
-                onClick={() => filme.id && handleDelete(filme.id)}
-              >
-                <i className="bi bi-trash me-1"></i>
-                Excluir
-              </button>
-            </div>
+            
+            {/* 3. A regra em ação: Só renderiza o footer se for Admin */}
+            {isAdmin && (
+              <div className="card-footer bg-transparent border-secondary d-flex gap-2">
+                <button
+                  className="btn btn-outline-warning btn-sm w-50"
+                  onClick={() => onEdit(filme)}
+                >
+                  <i className="bi bi-pencil me-1"></i>
+                  Editar
+                </button>
+                <button
+                  className="btn btn-outline-danger btn-sm w-50"
+                  onClick={() => filme.id && handleDelete(filme.id)}
+                >
+                  <i className="bi bi-trash me-1"></i>
+                  Excluir
+                </button>
+              </div>
+            )}
+            
           </div>
         </div>
       ))}

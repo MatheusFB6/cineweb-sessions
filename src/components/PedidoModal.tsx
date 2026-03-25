@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { SessaoComDetalhes, LancheCombo, Pedido, Ingresso } from '@/types';
-import { createPedido, getLanches } from '@/services/api';
+import { createPedido, getLancheCombos as getLanches } from '@/services/api';
 
 interface PedidoModalProps {
   isOpen: boolean;
@@ -31,8 +31,8 @@ const PedidoModal = ({ isOpen, onClose, sessao }: PedidoModalProps) => {
 
   const loadLanches = async () => {
     try {
-      const res = await getLanches();
-      setLanchesDisponiveis(res.data);
+      const data = await getLanches();
+      setLanchesDisponiveis(data);
     } catch (err) {
       console.error(err);
     }

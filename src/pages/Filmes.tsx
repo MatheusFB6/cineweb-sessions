@@ -4,16 +4,19 @@ import FilmeForm from '@/components/FilmeForm';
 import FilmesList from '@/components/FilmesList';
 import { getFilmes } from '@/services/api';
 import { Filme } from '@/types';
+import { useAuth } from '@/contexts/AuthContext';
 
 const Filmes = () => {
   const [filmes, setFilmes] = useState<Filme[]>([]);
   const [loading, setLoading] = useState(true);
   const [filmeEditando, setFilmeEditando] = useState<Filme | null>(null);
 
+  const { isAdmin } = useAuth();
+
   const fetchFilmes = async () => {
     try {
-      const response = await getFilmes();
-      setFilmes(response.data);
+      const data = await getFilmes();
+      setFilmes(data);
     } catch (error) {
       console.error('Erro ao carregar filmes:', error);
     } finally {
@@ -46,15 +49,18 @@ const Filmes = () => {
           </div>
         </div>
 
-        <div className="row">
-          <div className="col-12 mb-4">
-            <FilmeForm 
-              onSuccess={handleSuccess} 
-              filmeEditando={filmeEditando}
-              onCancel={handleCancel}
-            />
+        {/* 3. A REGRA: Mostra a linha do formulário de criar/editar APENAS se for Admin */}
+        {isAdmin && (
+          <div className="row">
+            <div className="col-12 mb-4">
+              <FilmeForm 
+                onSuccess={handleSuccess} 
+                filmeEditando={filmeEditando}
+                onCancel={handleCancel}
+              />
+            </div>
           </div>
-        </div>
+        )}
 
         <div className="row">
           <div className="col-12">

@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom'; // 1. Para redirecionar para o login
 import { Sessao, SessaoComDetalhes } from '@/types';
 import { deleteSessao, getFilmes, getSalas } from '@/services/api';
 import PedidoModal from './PedidoModal';
+import { useAuth } from '@/contexts/AuthContext'; // 2. Nosso hook de autenticação
 
 interface SessoesListProps {
   sessoes: Sessao[];
@@ -14,12 +16,15 @@ const SessoesList = ({ sessoes, onDelete, onEdit }: SessoesListProps) => {
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedSessao, setSelectedSessao] = useState<SessaoComDetalhes | null>(null);
 
+  // 3. Extraindo os dados e funções de navegação
+  const { isAuthenticated, isAdmin } = useAuth();
+  const navigate = useNavigate();
+
   useEffect(() => {
     const enrichSessoes = async () => {
       try {
-        const [filmesRes, salasRes] = await Promise.all([getFilmes(), getSalas()]);
-        const filmes = filmesRes.data;
-        const salas = salasRes.data;
+        // Correção: getFilmes() e getSalas() já retornam os arrays diretamente agora
+        const [filmes, salas] = await Promise.all([getFilmes(), getSalas()]);
 
         const enriched = sessoes.map((sessao) => ({
           ...sessao,
@@ -51,7 +56,15 @@ const SessoesList = ({ sessoes, onDelete, onEdit }: SessoesListProps) => {
     }
   };
 
+  // 4. A REGRA DE COMPRA: Intercepta o clique
   const handleVenderIngresso = (sessao: SessaoComDetalhes) => {
+    if (!isAuthenticated) {
+      alert('Você precisa estar logado para comprar ingressos!');
+      navigate('/login');
+      return; // Para a execução aqui, não abre o modal
+    }
+
+    // Se estiver logado, segue o fluxo normal
     setSelectedSessao(sessao);
     setModalOpen(true);
   };
@@ -71,7 +84,7 @@ const SessoesList = ({ sessoes, onDelete, onEdit }: SessoesListProps) => {
     return (
       <div className="alert alert-secondary text-center">
         <i className="bi bi-calendar-x me-2"></i>
-        Nenhuma sessão agendada. Agende uma sessão usando o formulário acima.
+        Nenhuma sessão agendada.
       </div>
     );
   }
@@ -79,7 +92,7 @@ const SessoesList = ({ sessoes, onDelete, onEdit }: SessoesListProps) => {
   return (
     <>
       <div className="table-responsive">
-        <table className="table table-dark table-hover">
+        <table className="table table-dark table-hover align-middle">
           <thead className="table-warning">
             <tr>
               <th className="text-dark">
@@ -125,26 +138,35 @@ const SessoesList = ({ sessoes, onDelete, onEdit }: SessoesListProps) => {
                   {formatDateTime(sessao.dataHora)}
                 </td>
                 <td className="text-end">
-                  <div className="btn-group">
+                  <div className="btn-group gap-1">
+                    {/* Botão de comprar: Visível para todos, mas bloqueia quem não tem login */}
                     <button
-                      className="btn btn-success btn-sm"
+                      className="btn btn-success btn-sm rounded"
                       onClick={() => handleVenderIngresso(sessao)}
                     >
                       <i className="bi bi-ticket-perforated me-1"></i>
-                      Vender Ingresso
+                      Comprar Ingresso
                     </button>
-                    <button
-                      className="btn btn-outline-warning btn-sm"
-                      onClick={() => onEdit(sessao)}
-                    >
-                      <i className="bi bi-pencil"></i>
-                    </button>
-                    <button
-                      className="btn btn-outline-danger btn-sm"
-                      onClick={() => sessao.id && handleDelete(sessao.id)}
-                    >
-                      <i className="bi bi-trash"></i>
-                    </button>
+                    
+                    {/* 5. A REGRA DE EDIÇÃO: Só mostra para Admin */}
+                    {isAdmin && (
+                      <>
+                        <button
+                          className="btn btn-outline-warning btn-sm rounded"
+                          onClick={() => onEdit(sessao)}
+                          title="Editar Sessão"
+                        >
+                          <i className="bi bi-pencil"></i>
+                        </button>
+                        <button
+                          className="btn btn-outline-danger btn-sm rounded"
+                          onClick={() => sessao.id && handleDelete(sessao.id)}
+                          title="Excluir Sessão"
+                        >
+                          <i className="bi bi-trash"></i>
+                        </button>
+                      </>
+                    )}
                   </div>
                 </td>
               </tr>

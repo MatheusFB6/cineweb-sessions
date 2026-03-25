@@ -1,59 +1,60 @@
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { NavLink } from '../components/NavLink';
+import { useAuth } from '../contexts/AuthContext'; // Importe o hook!
 
-const Navbar = () => {
-  const location = useLocation();
+export default function Navbar() {
+  const { user, isAuthenticated, signOut, isAdmin } = useAuth();
+  const navigate = useNavigate();
 
-  const isActive = (path: string) => location.pathname === path;
+  const handleLogout = () => {
+    signOut();
+    navigate('/login');
+  };
 
   return (
-    <nav className="navbar navbar-expand-lg navbar-dark bg-dark border-bottom border-warning">
-      <div className="container">
-        <Link to="/" className="navbar-brand d-flex align-items-center">
-          <i className="bi bi-film text-warning me-2 fs-4"></i>
-          <span className="fw-bold">CineWeb</span>
-        </Link>
-        
-        <button
-          className="navbar-toggler"
-          type="button"
-          data-bs-toggle="collapse"
-          data-bs-target="#navbarNav"
-        >
-          <span className="navbar-toggler-icon"></span>
-        </button>
+    <nav className="bg-blue-600 text-white shadow-lg">
+      <div className="container mx-auto px-4">
+        <div className="flex items-center justify-between h-16">
+          <div className="flex items-center space-x-8">
+            <Link to="/filmes" className="text-xl font-bold tracking-wider">
+              CINEWEB
+            </Link>
+            
+            <div className="hidden md:flex space-x-4">
+              <NavLink to="/filmes">Filmes</NavLink>
+              <NavLink to="/sessoes">Sessões</NavLink>
+              <NavLink to="/lanches">Lanches</NavLink>
+              
+              {/* Mostra a aba Salas apenas se for Admin */}
+              {isAdmin && <NavLink to="/salas">Salas</NavLink>}
+            </div>
+          </div>
 
-        <div className="collapse navbar-collapse" id="navbarNav">
-          <ul className="navbar-nav ms-auto">
-            <li className="nav-item">
-              <Link to="/" className={`nav-link ${isActive('/') ? 'active text-warning' : ''}`}>
-                <i className="bi bi-house-door me-1"></i> Início
+          <div className="flex items-center space-x-4">
+            {isAuthenticated ? (
+              <div className="flex items-center space-x-4">
+                <span className="text-sm">
+                  Olá, <strong className="font-semibold">{user?.name}</strong>
+                  {isAdmin && <span className="ml-2 text-xs bg-red-500 px-2 py-1 rounded">Admin</span>}
+                </span>
+                <button 
+                  onClick={handleLogout}
+                  className="bg-blue-700 hover:bg-blue-800 px-4 py-2 rounded text-sm transition-colors"
+                >
+                  Sair
+                </button>
+              </div>
+            ) : (
+              <Link 
+                to="/login"
+                className="bg-white text-blue-600 hover:bg-gray-100 px-4 py-2 rounded font-semibold text-sm transition-colors"
+              >
+                Login
               </Link>
-            </li>
-            <li className="nav-item">
-              <Link to="/filmes" className={`nav-link ${isActive('/filmes') ? 'active text-warning' : ''}`}>
-                <i className="bi bi-camera-reels me-1"></i> Filmes
-              </Link>
-            </li>
-            <li className="nav-item">
-              <Link to="/salas" className={`nav-link ${isActive('/salas') ? 'active text-warning' : ''}`}>
-                <i className="bi bi-door-open me-1"></i> Salas
-              </Link>
-            </li>
-            <li className="nav-item">
-              <Link to="/sessoes" className={`nav-link ${isActive('/sessoes') ? 'active text-warning' : ''}`}>
-                <i className="bi bi-calendar-event me-1"></i> Sessões
-              </Link>
-            </li>
-            <li className="nav-item">
-              <Link to="/lanches" className={`nav-link ${isActive('/lanches') ? 'active text-warning' : ''}`}>
-                <i className="bi bi-cup-straw me-1"></i> Lanches
-              </Link>
-            </li>
-          </ul>
+            )}
+          </div>
         </div>
       </div>
     </nav>
   );
-};
-
-export default Navbar;
+}
