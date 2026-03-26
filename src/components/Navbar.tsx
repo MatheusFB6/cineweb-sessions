@@ -29,6 +29,11 @@ export default function Navbar() {
             <NavLink to="/sessoes" className="nav-link text-light hover-warning">Sessões</NavLink>
             <NavLink to="/lanches" className="nav-link text-light hover-warning">Lanches</NavLink>
             {isAdmin && <NavLink to="/salas" className="nav-link text-light hover-warning">Salas</NavLink>}
+            {isAuthenticated && !isAdmin && (
+              <NavLink to="/meus-pedidos" className="nav-link text-light hover-warning">
+                <i className="bi bi-bag-heart me-1"></i>Meus Pedidos
+              </NavLink>
+            )}
           </div>
 
           <div className="d-flex align-items-center">

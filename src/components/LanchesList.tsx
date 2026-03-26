@@ -47,60 +47,60 @@ const LanchesList = ({ lanches, onDelete, onEdit }: LanchesListProps) => {
   }
 
   return (
-    <div className="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4">
-      {lanches.map((lanche) => (
-        <div className="col" key={lanche.id}>
-          <div className="card h-100 bg-dark border-secondary text-light">
-            <div className="card-body">
-              <div className="d-flex justify-content-between align-items-start mb-2">
-                <h5 className="card-title text-warning mb-0">{lanche.nome}</h5>
-                <span className="badge bg-success">
-                  R$ {Number(lanche.valorUnitario).toFixed(2)}
-                </span>
-              </div>
-              {lanche.descricao && (
-                <p className="card-text small text-secondary mb-3">
-                  {lanche.descricao}
-                </p>
-              )}
-              <div className="mt-auto">
-                <small className="text-muted d-block mb-3">
-                  Quantidade disponível: {lanche.qtUnidade}
-                </small>
-                
-                {/* Botão visível a todos, mas protegido pela função de clique */}
-                <button
-                  className="btn btn-success btn-sm w-100 mb-2"
-                  onClick={() => handleComprarLanche(lanche)}
-                >
-                  <i className="bi bi-cart-plus me-1"></i>
-                  Comprar
-                </button>
+    <div className="table-responsive">
+      <table className="table table-dark table-striped table-hover align-middle border-secondary">
+        <thead className="text-warning">
+          <tr>
+            <th>Nome</th>
+            <th>Descrição</th>
+            <th>Valor Unit. (R$)</th>
+            <th>Qtd. Estoque</th>
+            <th>Subtotal (R$)</th>
+            <th className="text-center">Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          {lanches.map((lanche) => (
+            <tr key={lanche.id}>
+              <td className="fw-bold">{lanche.nome}</td>
+              <td className="text-secondary small">{lanche.descricao || '—'}</td>
+              <td>{Number(lanche.valorUnitario).toFixed(2)}</td>
+              <td>{lanche.quantidade}</td>
+              <td>{Number(lanche.subtotal).toFixed(2)}</td>
+              <td>
+                <div className="d-flex gap-2 justify-content-center">
+                  <button
+                    className="btn btn-success btn-sm"
+                    onClick={() => handleComprarLanche(lanche)}
+                  >
+                    <i className="bi bi-cart-plus me-1"></i>
+                    Comprar
+                  </button>
 
-                {/* Botões de gestão escondidos dos utilizadores comuns */}
-                {isAdmin && (
-                  <div className="d-flex gap-2">
-                    <button
-                      className="btn btn-outline-warning btn-sm w-50"
-                      onClick={() => onEdit(lanche)}
-                    >
-                      <i className="bi bi-pencil me-1"></i>
-                      Editar
-                    </button>
-                    <button
-                      className="btn btn-outline-danger btn-sm w-50"
-                      onClick={() => lanche.id && handleDelete(lanche.id)}
-                    >
-                      <i className="bi bi-trash me-1"></i>
-                      Excluir
-                    </button>
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-        </div>
-      ))}
+                  {isAdmin && (
+                    <>
+                      <button
+                        className="btn btn-outline-warning btn-sm"
+                        onClick={() => onEdit(lanche)}
+                        title="Editar"
+                      >
+                        <i className="bi bi-pencil"></i>
+                      </button>
+                      <button
+                        className="btn btn-outline-danger btn-sm"
+                        onClick={() => lanche.id && handleDelete(lanche.id)}
+                        title="Excluir"
+                      >
+                        <i className="bi bi-trash"></i>
+                      </button>
+                    </>
+                  )}
+                </div>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
 };

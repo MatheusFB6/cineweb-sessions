@@ -1,23 +1,33 @@
 import { useState, useEffect } from 'react';
-import { SessaoComDetalhes, LancheCombo, Pedido, Ingresso } from '@/types';
-import { createPedido, getLancheCombos as getLanches } from '@/services/api';
+import { LancheCombo } from '@/types';
+import { createPedido, getLancheCombos as getLanches, api } from '@/services/api';
+import { useAuth } from '@/contexts/AuthContext';
+
+interface SessaoInfo {
+  id: number;
+  horarioExibicao: string;
+  filme?: { titulo: string };
+  sala?: { numero: number };
+}
 
 interface PedidoModalProps {
   isOpen: boolean;
   onClose: () => void;
-  sessao: SessaoComDetalhes | null;
+  sessao: SessaoInfo | null;
 }
 
 const PRECO_INTEIRA = 40.0;
 const PRECO_MEIA = 20.0;
 
 const PedidoModal = ({ isOpen, onClose, sessao }: PedidoModalProps) => {
+  const { user } = useAuth();
   const [qtInteira, setQtInteira] = useState(0);
   const [qtMeia, setQtMeia] = useState(0);
   const [lanchesDisponiveis, setLanchesDisponiveis] = useState<LancheCombo[]>([]);
   const [lanchesSelecionados, setLanchesSelecionados] = useState<{ lanche: LancheCombo; qtd: number }[]>([]);
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [error, setError] = useState('');
 
   useEffect(() => {
     if (isOpen) {
@@ -25,6 +35,7 @@ const PedidoModal = ({ isOpen, onClose, sessao }: PedidoModalProps) => {
       setQtMeia(0);
       setLanchesSelecionados([]);
       setSuccess(false);
+      setError('');
       loadLanches();
     }
   }, [isOpen]);
@@ -54,47 +65,56 @@ const PedidoModal = ({ isOpen, onClose, sessao }: PedidoModalProps) => {
     setLanchesSelecionados((prev) => prev.filter((item) => item.lanche.id !== lancheId));
   };
 
-  // Cálculos
   const totalIngressos = qtInteira * PRECO_INTEIRA + qtMeia * PRECO_MEIA;
-  const totalLanches = lanchesSelecionados.reduce((acc, item) => acc + (item.lanche.valorUnitario * item.qtd), 0);
+  const totalLanches = lanchesSelecionados.reduce(
+    (acc, item) => acc + item.lanche.valorUnitario * item.qtd,
+    0
+  );
   const valorTotal = totalIngressos + totalLanches;
 
   const handleSubmit = async () => {
     if (!sessao?.id) return;
+    if (qtInteira === 0 && qtMeia === 0) {
+      setError('Selecione ao menos 1 ingresso.');
+      return;
+    }
     setLoading(true);
+    setError('');
 
     try {
-      // Montar lista de objetos Ingresso conforme diagrama
-      const listaIngressos: Ingresso[] = [];
-      for (let i = 0; i < qtInteira; i++) {
-        listaIngressos.push({ sessaoId: sessao.id!, tipo: 'Inteira', valor: PRECO_INTEIRA });
+      // 1. Prepara os dados do JSON
+      const ingressosInfo = [];
+      if (qtInteira > 0) {
+        ingressosInfo.push({ tipo: 'Inteira', qtd: qtInteira, valorUnitario: PRECO_INTEIRA, sessaoId: sessao.id });
       }
-      for (let i = 0; i < qtMeia; i++) {
-        listaIngressos.push({ sessaoId: sessao.id!, tipo: 'Meia', valor: PRECO_MEIA });
+      if (qtMeia > 0) {
+        ingressosInfo.push({ tipo: 'Meia', qtd: qtMeia, valorUnitario: PRECO_MEIA, sessaoId: sessao.id });
       }
 
-      // Montar lista de Lanches conforme formato exigido pelo backend
-      const listaLanchesPedido = lanchesSelecionados.map(item => ({
-        id: item.lanche.id!,
-        qtUnidade: item.qtd,
-        subtotal: item.lanche.valorUnitario * item.qtd
+      const lanchesInfo = lanchesSelecionados.map((item) => ({
+        id: item.lanche.id,
+        nome: item.lanche.nome,
+        valorUnitario: item.lanche.valorUnitario,
+        quantidade: item.qtd,
+        subtotal: item.lanche.valorUnitario * item.qtd,
       }));
 
-      const novoPedido: Omit<Pedido, 'id'> = {
+      // 2. Envia requisição única criando o Pedido com a "foto" dos itens
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      await createPedido({
         qtInteira,
         qtMeia,
-        ingressos: listaIngressos,
-        lanches: listaLanchesPedido,
-        valorTotal
-      };
+        valorTotal,
+        userId: user?.id,
+        ingressosInfo,
+        lanchesInfo,
+      } as any);
 
-      await createPedido(novoPedido);
       setSuccess(true);
-      setTimeout(() => onClose(), 2000);
-
-    } catch (error) {
-      console.error('Erro ao criar pedido:', error);
-      alert('Erro ao processar pedido.');
+      setTimeout(() => onClose(), 2500);
+    } catch (err) {
+      console.error('Erro ao criar pedido:', err);
+      setError('Erro ao processar pedido. Tente novamente.');
     } finally {
       setLoading(false);
     }
@@ -103,82 +123,163 @@ const PedidoModal = ({ isOpen, onClose, sessao }: PedidoModalProps) => {
   if (!isOpen) return null;
 
   return (
-    <div className="modal d-block" style={{ backgroundColor: 'rgba(0,0,0,0.8)' }}>
+    <div className="modal d-block" style={{ backgroundColor: 'rgba(0,0,0,0.85)' }}>
       <div className="modal-dialog modal-lg modal-dialog-centered">
         <div className="modal-content bg-dark border border-warning">
           <div className="modal-header bg-warning text-dark border-0">
-            <h5 className="modal-title"><i className="bi bi-cart me-2"></i>Novo Pedido</h5>
+            <h5 className="modal-title fw-bold">
+              <i className="bi bi-cart-fill me-2"></i>Comprar Ingressos
+            </h5>
             <button type="button" className="btn-close" onClick={onClose} disabled={loading}></button>
           </div>
+
           <div className="modal-body text-light">
             {success ? (
               <div className="text-center py-5">
                 <i className="bi bi-check-circle-fill text-success display-1"></i>
-                <h4 className="mt-3 text-success">Pedido Realizado com Sucesso!</h4>
+                <h4 className="mt-3 text-success fw-bold">Pedido Realizado!</h4>
+                <p className="text-secondary">Seus ingressos foram reservados com sucesso.</p>
               </div>
             ) : (
               <div className="row">
-                {/* Coluna Esquerda: Ingressos e Lanches */}
-                <div className="col-md-7 border-end border-secondary">
-                  <h6 className="text-warning mb-3">1. Selecione os Ingressos</h6>
-                  <div className="d-flex justify-content-between align-items-center mb-2">
-                    <span>Inteira (R$ {PRECO_INTEIRA})</span>
-                    <input type="number" min="0" className="form-control w-25 bg-secondary text-light border-0" value={qtInteira} onChange={(e) => setQtInteira(Number(e.target.value))} />
-                  </div>
-                  <div className="d-flex justify-content-between align-items-center mb-4">
-                    <span>Meia (R$ {PRECO_MEIA})</span>
-                    <input type="number" min="0" className="form-control w-25 bg-secondary text-light border-0" value={qtMeia} onChange={(e) => setQtMeia(Number(e.target.value))} />
-                  </div>
-
-                  <h6 className="text-warning mb-3">2. Adicionar Lanches</h6>
-                  <div className="list-group mb-3">
-                    {lanchesDisponiveis.map(lanche => (
-                      <button key={lanche.id} type="button" className="list-group-item list-group-item-action bg-secondary text-light border-dark d-flex justify-content-between align-items-center" onClick={() => handleAddLanche(lanche)}>
+                {/* Esquerda */}
+                <div className="col-md-7 border-end border-secondary pe-4">
+                  {/* Sessão */}
+                  {sessao && (
+                    <div className="card bg-secondary bg-opacity-25 border-secondary mb-4 p-3">
+                      <div className="d-flex align-items-center gap-2">
+                        <i className="bi bi-camera-reels-fill text-warning fs-4"></i>
                         <div>
-                          <strong>{lanche.nome}</strong>
-                          <small className="d-block text-light opacity-75">{lanche.descricao}</small>
+                          <div className="fw-bold">{sessao.filme?.titulo ?? 'Sessão'}</div>
+                          <small className="text-secondary">
+                            Sala {sessao.sala?.numero} •{' '}
+                            {sessao.horarioExibicao && new Date(sessao.horarioExibicao).toLocaleString('pt-BR')}
+                          </small>
                         </div>
-                        <span className="badge bg-warning text-dark">R$ {lanche.valorUnitario.toFixed(2)}</span>
-                      </button>
-                    ))}
-                  </div>
-                </div>
+                      </div>
+                    </div>
+                  )}
 
-                {/* Coluna Direita: Resumo */}
-                <div className="col-md-5">
-                  <h6 className="text-warning mb-3">Resumo do Pedido</h6>
-                  <div className="card bg-secondary border-0 mb-3">
-                    <div className="card-body p-2">
-                      <small className="d-block"><strong>Filme:</strong> {sessao?.filme?.titulo}</small>
-                      <small className="d-block"><strong>Sala:</strong> {sessao?.sala?.numero}</small>
-                      <small className="d-block"><strong>Data:</strong> {sessao?.dataHora && new Date(sessao.dataHora).toLocaleString('pt-BR')}</small>
+                  {/* Ingressos */}
+                  <h6 className="text-warning mb-3">
+                    <i className="bi bi-ticket-perforated me-2"></i>Ingressos
+                  </h6>
+                  <div className="d-flex justify-content-between align-items-center mb-3 p-2 border border-secondary rounded">
+                    <div>
+                      <span className="fw-semibold">Inteira</span>
+                      <span className="text-warning ms-2">R$ {PRECO_INTEIRA.toFixed(2)}</span>
+                    </div>
+                    <div className="d-flex align-items-center gap-2">
+                      <button className="btn btn-sm btn-outline-warning" onClick={() => setQtInteira(Math.max(0, qtInteira - 1))}>−</button>
+                      <span className="fw-bold px-2">{qtInteira}</span>
+                      <button className="btn btn-sm btn-outline-warning" onClick={() => setQtInteira(qtInteira + 1)}>+</button>
+                    </div>
+                  </div>
+                  <div className="d-flex justify-content-between align-items-center mb-4 p-2 border border-secondary rounded">
+                    <div>
+                      <span className="fw-semibold">Meia-entrada</span>
+                      <span className="text-warning ms-2">R$ {PRECO_MEIA.toFixed(2)}</span>
+                    </div>
+                    <div className="d-flex align-items-center gap-2">
+                      <button className="btn btn-sm btn-outline-warning" onClick={() => setQtMeia(Math.max(0, qtMeia - 1))}>−</button>
+                      <span className="fw-bold px-2">{qtMeia}</span>
+                      <button className="btn btn-sm btn-outline-warning" onClick={() => setQtMeia(qtMeia + 1)}>+</button>
                     </div>
                   </div>
 
-                  <ul className="list-group list-group-flush bg-transparent small mb-3">
-                    {qtInteira > 0 && <li className="list-group-item bg-transparent text-light d-flex justify-content-between"><span>{qtInteira}x Inteira</span> <span>R$ {(qtInteira * PRECO_INTEIRA).toFixed(2)}</span></li>}
-                    {qtMeia > 0 && <li className="list-group-item bg-transparent text-light d-flex justify-content-between"><span>{qtMeia}x Meia</span> <span>R$ {(qtMeia * PRECO_MEIA).toFixed(2)}</span></li>}
+                  {/* Lanches */}
+                  <h6 className="text-warning mb-3">
+                    <i className="bi bi-cup-straw me-2"></i>Bomboniere
+                  </h6>
+                  {lanchesDisponiveis.length === 0 ? (
+                    <p className="text-secondary small">Nenhum produto disponível no momento.</p>
+                  ) : (
+                    <div className="d-flex flex-column gap-2">
+                      {lanchesDisponiveis.map((lanche) => (
+                        <button
+                          key={lanche.id}
+                          type="button"
+                          className="btn btn-outline-secondary text-start d-flex justify-content-between align-items-center"
+                          onClick={() => handleAddLanche(lanche)}
+                        >
+                          <div>
+                            <div className="fw-semibold text-light">{lanche.nome}</div>
+                            {lanche.descricao && <small className="text-secondary">{lanche.descricao}</small>}
+                          </div>
+                          <span className="badge bg-warning text-dark ms-2">
+                            + R$ {lanche.valorUnitario.toFixed(2)}
+                          </span>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                {/* Direita — Resumo */}
+                <div className="col-md-5 ps-4">
+                  <h6 className="text-warning mb-3">
+                    <i className="bi bi-receipt me-2"></i>Resumo
+                  </h6>
+
+                  <ul className="list-unstyled small mb-3">
+                    {qtInteira > 0 && (
+                      <li className="d-flex justify-content-between mb-1">
+                        <span>{qtInteira}x Inteira</span>
+                        <span className="text-warning">R$ {(qtInteira * PRECO_INTEIRA).toFixed(2)}</span>
+                      </li>
+                    )}
+                    {qtMeia > 0 && (
+                      <li className="d-flex justify-content-between mb-1">
+                        <span>{qtMeia}x Meia</span>
+                        <span className="text-warning">R$ {(qtMeia * PRECO_MEIA).toFixed(2)}</span>
+                      </li>
+                    )}
                     {lanchesSelecionados.map((item, idx) => (
-                      <li key={idx} className="list-group-item bg-transparent text-light d-flex justify-content-between align-items-center">
+                      <li key={idx} className="d-flex justify-content-between align-items-center mb-1">
                         <span>{item.qtd}x {item.lanche.nome}</span>
-                        <div>
-                           <span className="me-2">R$ {(item.qtd * item.lanche.valorUnitario).toFixed(2)}</span>
-                           <i className="bi bi-x-circle text-danger cursor-pointer" style={{cursor: 'pointer'}} onClick={() => handleRemoveLanche(item.lanche.id!)}></i>
+                        <div className="d-flex align-items-center gap-2">
+                          <span className="text-warning">R$ {(item.qtd * item.lanche.valorUnitario).toFixed(2)}</span>
+                          <button className="btn btn-link text-danger p-0" onClick={() => handleRemoveLanche(item.lanche.id!)}>
+                            <i className="bi bi-x-circle"></i>
+                          </button>
                         </div>
                       </li>
                     ))}
+                    {qtInteira === 0 && qtMeia === 0 && lanchesSelecionados.length === 0 && (
+                      <li className="text-secondary text-center py-3">Nenhum item selecionado</li>
+                    )}
                   </ul>
 
-                  <div className="alert alert-warning bg-warning bg-opacity-25 border-warning text-light">
-                    <div className="d-flex justify-content-between align-items-center">
-                      <span className="fw-bold">Total:</span>
-                      <span className="fs-4 fw-bold text-warning">R$ {valorTotal.toFixed(2)}</span>
-                    </div>
+                  <hr className="border-secondary" />
+
+                  <div className="d-flex justify-content-between align-items-center mb-3">
+                    <span className="fw-bold">Total</span>
+                    <span className="fs-4 fw-bold text-warning">R$ {valorTotal.toFixed(2)}</span>
                   </div>
 
-                  <button className="btn btn-success w-100 py-2" onClick={handleSubmit} disabled={loading || valorTotal === 0}>
-                    {loading ? 'Processando...' : <><i className="bi bi-check-circle me-2"></i> Finalizar Pedido</>}
+                  {error && (
+                    <div className="alert alert-danger border-danger bg-dark text-danger small p-2 mb-3">
+                      <i className="bi bi-exclamation-triangle me-1"></i>{error}
+                    </div>
+                  )}
+
+                  <button
+                    className="btn btn-success w-100 py-2 fw-bold"
+                    onClick={handleSubmit}
+                    disabled={loading || valorTotal === 0}
+                  >
+                    {loading ? (
+                      <><span className="spinner-border spinner-border-sm me-2"></span>Processando...</>
+                    ) : (
+                      <><i className="bi bi-check-circle me-2"></i>Finalizar Pedido</>
+                    )}
                   </button>
+
+                  {user && (
+                    <p className="text-center text-secondary small mt-2">
+                      <i className="bi bi-person me-1"></i>Comprando como <strong className="text-warning">{user.name}</strong>
+                    </p>
+                  )}
                 </div>
               </div>
             )}

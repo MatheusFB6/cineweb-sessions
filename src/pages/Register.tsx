@@ -55,7 +55,7 @@ export default function Register() {
 
     try {
       // 1. Cria o usuário no banco de dados
-      const profileId = isAdmin ? 1 : 2;
+      const profileId = isAdmin ? 'profile-admin-001' : 'profile-user-001';
       const newUser = await registerUser({
         name,
         email,

@@ -3,10 +3,10 @@ import { api } from '../services/api';
 
 // Tipagem do Usuário logado
 export interface User {
-  id: number;
+  id: string;
   email: string;
   name: string;
-  profileId: number; // É aqui que definiremos quem é Admin e quem é User comum
+  profileId: string;
 }
 
 interface AuthContextData {
@@ -55,7 +55,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   // REGRA DE NEGÓCIO: Supondo que o Perfil de ADMIN no seu banco seja o ID 1
-  const isAdmin = user?.profileId === 1;
+  const isAdmin = user?.profileId === 'profile-admin-001';
 
   return (
     <AuthContext.Provider 

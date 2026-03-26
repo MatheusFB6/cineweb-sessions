@@ -145,7 +145,7 @@ export interface RegisterData {
   name?: string;
   email: string;
   password?: string;
-  profileId?: number;
+  profileId?: string;
 }
 
 export const registerUser = async (userData: RegisterData) => {

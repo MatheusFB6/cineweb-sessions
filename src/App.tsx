@@ -11,6 +11,7 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import Navbar from './components/Navbar';
 import AdminDashboard from './pages/admin/AdminDashboard';
+import MeusPedidos from './pages/MeusPedidos';
 
 function App() {
   return (
@@ -26,6 +27,9 @@ function App() {
           
           {/* Rotas Admin */}
           <Route path="/admin/dashboard" element={<AdminDashboard />} />
+          
+          {/* Rotas do Usuário */}
+          <Route path="/meus-pedidos" element={<MeusPedidos />} />
           
           {/* Rotas de Autenticação */}
           <Route path="/login" element={<Login />} />

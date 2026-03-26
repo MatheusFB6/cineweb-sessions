@@ -1,9 +1,71 @@
 import { useState } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
-import { Navigate, Link } from 'react-router-dom';
+import { Navigate } from 'react-router-dom';
 import GenericCrud from './GenericCrud';
+import PedidosAdminView from './PedidosAdminView';
 
-type AdminTab = 'home' | 'users' | 'profiles' | 'addresses' | 'cinemas' | 'ingressos' | 'pedidos';
+type AdminTab =
+  | 'home'
+  | 'users'
+  | 'profiles'
+  | 'addresses'
+  | 'cinemas'
+  | 'filmes'
+  | 'salas'
+  | 'sessoes'
+  | 'lanches'
+  | 'ingressos'
+  | 'pedidos';
+
+interface NavItem {
+  tab: AdminTab;
+  label: string;
+  icon: string;
+}
+
+const NAV_GROUPS: { title: string; icon: string; items: NavItem[] }[] = [
+  {
+    title: 'Usuários',
+    icon: 'bi-people',
+    items: [
+      { tab: 'users', label: 'Usuários', icon: 'bi-person' },
+      { tab: 'profiles', label: 'Perfis (Profiles)', icon: 'bi-file-earmark-person' },
+      { tab: 'addresses', label: 'Endereços', icon: 'bi-geo-alt' },
+    ],
+  },
+  {
+    title: 'Cinema',
+    icon: 'bi-building',
+    items: [
+      { tab: 'cinemas', label: 'Cinemas', icon: 'bi-building' },
+      { tab: 'filmes', label: 'Filmes', icon: 'bi-camera-reels' },
+      { tab: 'salas', label: 'Salas', icon: 'bi-door-open' },
+      { tab: 'sessoes', label: 'Sessões', icon: 'bi-calendar-event' },
+    ],
+  },
+  {
+    title: 'Vendas',
+    icon: 'bi-cart',
+    items: [
+      { tab: 'lanches', label: 'Lanches / Combos', icon: 'bi-cup-straw' },
+      { tab: 'ingressos', label: 'Ingressos', icon: 'bi-ticket-perforated' },
+      { tab: 'pedidos', label: 'Pedidos', icon: 'bi-cart' },
+    ],
+  },
+];
+
+const GENERO_OPTIONS = [
+  { label: 'Ação', value: 'ACAO' },
+  { label: 'Aventura', value: 'AVENTURA' },
+  { label: 'Comédia', value: 'COMEDIA' },
+  { label: 'Drama', value: 'DRAMA' },
+  { label: 'Terror', value: 'TERROR' },
+  { label: 'Ficção Científica', value: 'FICCAO' },
+  { label: 'Romance', value: 'ROMANCE' },
+  { label: 'Animação', value: 'ANIMACAO' },
+  { label: 'Documentário', value: 'DOCUMENTARIO' },
+  { label: 'Outro', value: 'OUTRO' },
+];
 
 export default function AdminDashboard() {
   const { user, isAdmin } = useAuth();
@@ -15,99 +77,236 @@ export default function AdminDashboard() {
 
   const renderContent = () => {
     switch (activeTab) {
+      // ---- USUÁRIOS ----
       case 'users':
-        return <GenericCrud 
-          title="Usuários" endpoint="/user" updateMethod="patch"
-          columns={[ { key: 'name', label: 'Nome' }, { key: 'email', label: 'E-mail' } ]}
-          fields={[
-            { name: 'name', label: 'Nome', type: 'text', required: true },
-            { name: 'email', label: 'E-mail', type: 'email', required: true },
-            { name: 'password', label: 'Senha', type: 'password', required: false },
-            { name: 'profileId', label: 'ID do Perfil (1=Admin, 2=Common)', type: 'number', required: true }
-          ]}
-        />;
+        return (
+          <GenericCrud
+            title="Usuários"
+            endpoint="/user"
+            updateMethod="patch"
+            columns={[
+              { key: 'name', label: 'Nome' },
+              { key: 'email', label: 'E-mail' },
+              { key: 'profileId', label: 'Profile', render: (v) => v === 'profile-admin-001' ? '🔴 Admin' : '🟢 User' },
+            ]}
+            fields={[
+              { name: 'name', label: 'Nome Completo', type: 'text', required: true },
+              { name: 'email', label: 'E-mail', type: 'email', required: true },
+              { name: 'password', label: 'Senha (deixe em branco para manter)', type: 'password', required: false },
+              {
+                name: 'profileId',
+                label: 'Perfil',
+                type: 'select',
+                required: true,
+                options: [
+                  { label: 'Usuário Comum', value: 'profile-user-001' },
+                  { label: 'Administrador', value: 'profile-admin-001' },
+                ],
+              },
+            ]}
+          />
+        );
+
       case 'profiles':
-        return <GenericCrud 
-          title="Perfis (Profiles)" endpoint="/profile" updateMethod="patch"
-          columns={[ { key: 'name', label: 'Nome do Perfil' } ]}
-          fields={[ { name: 'name', label: 'Nome do Perfil', type: 'text', required: true } ]}
-        />;
+        return (
+          <GenericCrud
+            title="Perfis (Profiles)"
+            endpoint="/profile"
+            updateMethod="patch"
+            columns={[{ key: 'name', label: 'Nome do Perfil' }]}
+            fields={[{ name: 'name', label: 'Nome do Perfil', type: 'text', required: true }]}
+          />
+        );
+
       case 'addresses':
-        return <GenericCrud 
-          title="Endereços" endpoint="/address" updateMethod="patch"
-          columns={[ { key: 'street', label: 'Rua' }, { key: 'city', label: 'Cidade' }, { key: 'userId', label: 'User ID' } ]}
-          fields={[
-            { name: 'street', label: 'Logradouro', type: 'text', required: true },
-            { name: 'number', label: 'Número', type: 'number', required: true },
-            { name: 'city', label: 'Cidade', type: 'text', required: true },
-            { name: 'state', label: 'Estado (UF)', type: 'text', required: true },
-            { name: 'zipCode', label: 'CEP', type: 'text', required: true },
-            { name: 'userId', label: 'ID do Usuário', type: 'number', required: true }
-          ]}
-        />;
+        return (
+          <GenericCrud
+            title="Endereços"
+            endpoint="/address"
+            updateMethod="patch"
+            columns={[
+              { key: 'street', label: 'Logradouro' },
+              { key: 'city', label: 'Cidade' },
+              { key: 'state', label: 'UF' },
+              { key: 'zipCode', label: 'CEP' },
+            ]}
+            fields={[
+              { name: 'street', label: 'Logradouro / Rua', type: 'text', required: true },
+              { name: 'number', label: 'Número', type: 'number', required: true },
+              { name: 'city', label: 'Cidade', type: 'text', required: true },
+              { name: 'state', label: 'Estado (UF)', type: 'text', required: true },
+              { name: 'zipCode', label: 'CEP', type: 'text', required: true },
+              { name: 'userId', label: 'ID do Usuário', type: 'text', required: true },
+            ]}
+          />
+        );
+
+      // ---- CINEMA ----
       case 'cinemas':
-        return <GenericCrud 
-          title="Cinemas" endpoint="/cinema" updateMethod="put"
-          columns={[ { key: 'nome', label: 'Nome' }, { key: 'endereco', label: 'Endereço' } ]}
-          fields={[
-            { name: 'nome', label: 'Nome do Cinema', type: 'text', required: true },
-            { name: 'endereco', label: 'Endereço Completo', type: 'text', required: true }
-          ]}
-        />;
+        return (
+          <GenericCrud
+            title="Cinemas"
+            endpoint="/cinema"
+            updateMethod="put"
+            columns={[
+              { key: 'nome', label: 'Nome' },
+              { key: 'endereco', label: 'Endereço' },
+            ]}
+            fields={[
+              { name: 'nome', label: 'Nome do Cinema', type: 'text', required: true },
+              { name: 'endereco', label: 'Endereço Completo', type: 'text', required: true, fullWidth: true },
+            ]}
+          />
+        );
+
+      case 'filmes':
+        return (
+          <GenericCrud
+            title="Filmes"
+            endpoint="/filmes"
+            updateMethod="put"
+            columns={[
+              { key: 'titulo', label: 'Título' },
+              { key: 'genero', label: 'Gênero' },
+              { key: 'classificacao', label: 'Classificação' },
+              { key: 'cinemaId', label: 'Cinema ID' },
+            ]}
+            fields={[
+              { name: 'titulo', label: 'Título', type: 'text', required: true },
+              { name: 'classificacao', label: 'Classificação (ex: 14)', type: 'text', required: false },
+              { name: 'duracao', label: 'Duração (data/hora ISO, ex: 2000-01-01T02:00:00.000Z)', type: 'text', required: true },
+              { name: 'elenco', label: 'Elenco', type: 'text', required: false },
+              {
+                name: 'genero',
+                label: 'Gênero',
+                type: 'select',
+                required: false,
+                options: GENERO_OPTIONS,
+              },
+              { name: 'dataInicioExibicao', label: 'Início Exibição (YYYY-MM-DD)', type: 'date', required: false },
+              { name: 'dataFinalExibicao', label: 'Fim Exibição (YYYY-MM-DD)', type: 'date', required: false },
+              { name: 'cinemaId', label: 'ID do Cinema', type: 'number', required: true },
+              { name: 'sinopse', label: 'Sinopse', type: 'textarea', required: false, fullWidth: true },
+            ]}
+          />
+        );
+
+      case 'salas':
+        return (
+          <GenericCrud
+            title="Salas"
+            endpoint="/salas"
+            updateMethod="put"
+            columns={[
+              { key: 'numero', label: 'Número da Sala' },
+              { key: 'capacidade', label: 'Capacidade' },
+              { key: 'cinemaId', label: 'Cinema ID' },
+            ]}
+            fields={[
+              { name: 'numero', label: 'Número da Sala', type: 'number', required: true },
+              { name: 'capacidade', label: 'Capacidade (lugares)', type: 'number', required: true },
+              { name: 'cinemaId', label: 'ID do Cinema', type: 'number', required: true },
+            ]}
+          />
+        );
+
+      case 'sessoes':
+        return (
+          <GenericCrud
+            title="Sessões"
+            endpoint="/sessoes"
+            updateMethod="put"
+            columns={[
+              { key: 'horarioExibicao', label: 'Horário', render: (v) => v ? new Date(v).toLocaleString('pt-BR') : '-' },
+              { key: 'filmeId', label: 'Filme ID' },
+              { key: 'salaId', label: 'Sala ID' },
+              { key: 'cinemaId', label: 'Cinema ID' },
+            ]}
+            fields={[
+              { name: 'horarioExibicao', label: 'Horário de Exibição', type: 'datetime-local', required: true },
+              { name: 'filmeId', label: 'ID do Filme', type: 'number', required: true },
+              { name: 'salaId', label: 'ID da Sala', type: 'number', required: true },
+              { name: 'cinemaId', label: 'ID do Cinema', type: 'number', required: true },
+            ]}
+          />
+        );
+
+      // ---- VENDAS ----
+      case 'lanches':
+        return (
+          <GenericCrud
+            title="Lanches / Combos"
+            endpoint="/lanches"
+            updateMethod="put"
+            columns={[
+              { key: 'nome', label: 'Nome' },
+              { key: 'valorUnitario', label: 'Valor Unit. (R$)' },
+              { key: 'quantidade', label: 'Qtd.' },
+              { key: 'subtotal', label: 'Subtotal (R$)' },
+            ]}
+            fields={[
+              { name: 'nome', label: 'Nome do Lanche / Combo', type: 'text', required: true },
+              { name: 'descricao', label: 'Descrição', type: 'textarea', required: false, fullWidth: true },
+              { name: 'valorUnitario', label: 'Valor Unitário (R$)', type: 'number', required: true },
+              { name: 'quantidade', label: 'Quantidade', type: 'number', required: true },
+              { name: 'subtotal', label: 'Subtotal (R$)', type: 'number', required: true },
+            ]}
+          />
+        );
+
       case 'ingressos':
-        return <GenericCrud 
-          title="Ingressos" endpoint="/ingressos" updateMethod="put"
-          columns={[ { key: 'sessaoId', label: 'ID da Sessão' }, { key: 'valorInteira', label: 'R$ Inteira' } ]}
-          fields={[
-            { name: 'sessaoId', label: 'ID da Sessão Relacionada', type: 'number', required: true },
-            { name: 'valorInteira', label: 'Valor da Inteira', type: 'number', required: true },
-            { name: 'valorMeia', label: 'Valor da Meia', type: 'number', required: true },
-            { name: 'tipo', label: 'Tipo (Inteira / Meia)', type: 'text', required: false }
-          ]}
-        />;
+        return (
+          <GenericCrud
+            title="Ingressos"
+            endpoint="/ingressos"
+            updateMethod="put"
+            columns={[
+              { key: 'sessaoId', label: 'ID da Sessão' },
+              { key: 'valorInteira', label: 'R$ Inteira' },
+              { key: 'valorMeia', label: 'R$ Meia' },
+            ]}
+            fields={[
+              { name: 'sessaoId', label: 'ID da Sessão', type: 'number', required: true },
+              { name: 'valorInteira', label: 'Valor da Inteira (R$)', type: 'number', required: true },
+              { name: 'valorMeia', label: 'Valor da Meia (R$)', type: 'number', required: true },
+              { name: 'pedidoId', label: 'ID do Pedido (opcional)', type: 'number', required: false },
+            ]}
+          />
+        );
+
       case 'pedidos':
-        return <GenericCrud 
-          title="Pedidos" endpoint="/pedidos" updateMethod="put"
-          columns={[ { key: 'valorTotal', label: 'Valor Total (R$)' }, { key: 'qtInteira', label: 'Qtd Inteiras' } ]}
-          fields={[
-            { name: 'qtInteira', label: 'Inteiras', type: 'number', required: true },
-            { name: 'qtMeia', label: 'Meias', type: 'number', required: true },
-            { name: 'valorTotal', label: 'Valor Total', type: 'number', required: true }
-          ]}
-        />;
+        return <PedidosAdminView />;
+
+      // ---- HOME ----
       default:
         return (
-          <div className="card bg-dark text-light border-secondary">
-            <div className="card-body py-5 text-center">
-              <i className="bi bi-shield-lock-fill text-warning display-1 mb-4"></i>
-              <h2 className="text-warning fw-bold">Painel de Controle Administrador</h2>
-              <p className="text-secondary mb-4">Bem-vindo, {user.name}! Você possui acesso total aos cadastros do sistema.</p>
-              
-              <div className="row g-4 justify-content-center mt-2">
-                <div className="col-md-4">
-                  <div className="p-4 border border-secondary rounded bg-black cursor-pointer align-items-center" onClick={() => setActiveTab('users')} style={{cursor: 'pointer'}}>
-                    <i className="bi bi-people-fill fs-2 text-warning mb-2"></i>
-                    <h5>Usuários</h5>
-                    <small className="text-secondary">Gerencie contas e perfis</small>
-                  </div>
-                </div>
-                <div className="col-md-4">
-                  <div className="p-4 border border-secondary rounded bg-black cursor-pointer align-items-center" onClick={() => setActiveTab('cinemas')} style={{cursor: 'pointer'}}>
-                    <i className="bi bi-building fs-2 text-warning mb-2"></i>
-                    <h5>Cinemas</h5>
-                    <small className="text-secondary">Redes e filiais</small>
-                  </div>
-                </div>
-                <div className="col-md-4">
-                  <Link to="/filmes" className="text-decoration-none">
-                    <div className="p-4 border border-secondary rounded bg-black cursor-pointer align-items-center" style={{cursor: 'pointer'}}>
-                      <i className="bi bi-camera-reels-fill fs-2 text-warning mb-2"></i>
-                      <h5 className="text-light">Filmes</h5>
-                      <small className="text-secondary">Catálogo principal</small>
-                    </div>
-                  </Link>
-                </div>
+          <div>
+            <div className="card bg-dark text-light border-secondary mb-4">
+              <div className="card-body py-4 text-center">
+                <i className="bi bi-shield-lock-fill text-warning display-1 mb-3"></i>
+                <h2 className="text-warning fw-bold">Painel de Controle</h2>
+                <p className="text-secondary mb-0">
+                  Bem-vindo, <strong className="text-warning">{user.name}</strong>! Você possui acesso administrativo completo.
+                </p>
               </div>
+            </div>
+
+            {/* Stats grid */}
+            <div className="row g-3">
+              {NAV_GROUPS.flatMap((g) => g.items).map(({ tab, label, icon }) => (
+                <div key={tab} className="col-6 col-md-4 col-lg-3">
+                  <div
+                    className="card bg-black border-secondary h-100 text-center p-3"
+                    onClick={() => setActiveTab(tab)}
+                    style={{ cursor: 'pointer', transition: 'border-color .2s' }}
+                    onMouseEnter={(e) => (e.currentTarget.style.borderColor = '#ffc107')}
+                    onMouseLeave={(e) => (e.currentTarget.style.borderColor = '')}
+                  >
+                    <i className={`bi ${icon} text-warning fs-2 mb-2`}></i>
+                    <div className="text-light fw-semibold small">{label}</div>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         );
@@ -120,61 +319,48 @@ export default function AdminDashboard() {
         {/* Sidebar */}
         <div className="col-md-3 col-lg-2 mb-4 mb-md-0">
           <div className="card bg-black border-secondary h-100">
-            <div className="card-body p-3 d-flex flex-column gap-2">
-              <h6 className="text-secondary text-uppercase fw-bold mb-3 fs-7">
-                <i className="bi bi-database me-2"></i>Banco de Dados
-              </h6>
-              
-              <button onClick={() => setActiveTab('home')} className={`btn text-start text-light ${activeTab === 'home' ? 'bg-secondary bg-opacity-25 border-warning border-start border-3' : 'border-0'}`}>
+            <div className="card-body p-2 d-flex flex-column gap-1">
+              {/* Dashboard home button */}
+              <button
+                onClick={() => setActiveTab('home')}
+                className={`btn text-start text-light w-100 mb-1 ${
+                  activeTab === 'home'
+                    ? 'border-warning border-start border-3 bg-warning bg-opacity-10'
+                    : 'border-0'
+                }`}
+              >
                 <i className="bi bi-house-door me-2"></i>Dashboard
               </button>
 
-              <hr className="border-secondary my-1" />
-
-              <button onClick={() => setActiveTab('users')} className={`btn text-start text-light ${activeTab === 'users' ? 'bg-secondary bg-opacity-25 border-warning border-start border-3' : 'border-0'}`}>
-                <i className="bi bi-person me-2"></i>Usuários
-              </button>
-              <button onClick={() => setActiveTab('profiles')} className={`btn text-start text-light ${activeTab === 'profiles' ? 'bg-secondary bg-opacity-25 border-warning border-start border-3' : 'border-0'}`}>
-                <i className="bi bi-file-earmark-person me-2"></i>Perfis (Profile)
-              </button>
-              <button onClick={() => setActiveTab('addresses')} className={`btn text-start text-light ${activeTab === 'addresses' ? 'bg-secondary bg-opacity-25 border-warning border-start border-3' : 'border-0'}`}>
-                <i className="bi bi-geo-alt me-2"></i>Endereços
-              </button>
-
-              <hr className="border-secondary my-1" />
-
-              <button onClick={() => setActiveTab('cinemas')} className={`btn text-start text-light ${activeTab === 'cinemas' ? 'bg-secondary bg-opacity-25 border-warning border-start border-3' : 'border-0'}`}>
-                <i className="bi bi-building me-2"></i>Cinemas
-              </button>
-              <Link to="/filmes" className="btn text-start text-light border-0">
-                <i className="bi bi-camera-reels me-2"></i>Filmes (Externo)
-              </Link>
-              <Link to="/salas" className="btn text-start text-light border-0">
-                <i className="bi bi-door-open me-2"></i>Salas (Externo)
-              </Link>
-              <Link to="/sessoes" className="btn text-start text-light border-0">
-                <i className="bi bi-calendar-event me-2"></i>Sessões (Externo)
-              </Link>
-              
-              <hr className="border-secondary my-1" />
-
-              <Link to="/lanches" className="btn text-start text-light border-0">
-                <i className="bi bi-cup-straw me-2"></i>Lanches (Externo)
-              </Link>
-              <button onClick={() => setActiveTab('ingressos')} className={`btn text-start text-light ${activeTab === 'ingressos' ? 'bg-secondary bg-opacity-25 border-warning border-start border-3' : 'border-0'}`}>
-                <i className="bi bi-ticket-perforated me-2"></i>Ingressos
-              </button>
-              <button onClick={() => setActiveTab('pedidos')} className={`btn text-start text-light ${activeTab === 'pedidos' ? 'bg-secondary bg-opacity-25 border-warning border-start border-3' : 'border-0'}`}>
-                <i className="bi bi-cart me-2"></i>Pedidos
-              </button>
+              {NAV_GROUPS.map((group) => (
+                <div key={group.title}>
+                  <div className="text-secondary text-uppercase fw-bold px-2 pb-1 mt-2" style={{ fontSize: '0.65rem', letterSpacing: '0.08em' }}>
+                    <i className={`bi ${group.icon} me-1`}></i>
+                    {group.title}
+                  </div>
+                  {group.items.map(({ tab, label, icon }) => (
+                    <button
+                      key={tab}
+                      onClick={() => setActiveTab(tab)}
+                      className={`btn text-start text-light w-100 py-1 ${
+                        activeTab === tab
+                          ? 'border-warning border-start border-3 bg-warning bg-opacity-10'
+                          : 'border-0'
+                      }`}
+                      style={{ fontSize: '0.88rem' }}
+                    >
+                      <i className={`bi ${icon} me-2`}></i>
+                      {label}
+                    </button>
+                  ))}
+                </div>
+              ))}
             </div>
           </div>
         </div>
 
-        {/* Content Area */}
-        <div className="col-md-9 col-lg-10">
-          {renderContent()}
-        </div>
+        {/* Content */}
+        <div className="col-md-9 col-lg-10">{renderContent()}</div>
       </div>
     </div>
   );
