@@ -39,12 +39,22 @@ const FilmeForm = ({ onSuccess, filmeEditando, onCancel }: FilmeFormProps) => {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
+    const getMinutesFromDate = (duracao: string | number | Date | undefined) => {
+      if (!duracao) return '';
+      if (typeof duracao === 'number') return String(duracao);
+      const date = new Date(duracao);
+      if (isNaN(date.getTime())) return '';
+      const hours = date.getUTCHours();
+      const minutes = date.getUTCMinutes();
+      return String(hours * 60 + minutes);
+    };
+
     if (filmeEditando) {
       setFormData({
         titulo: filmeEditando.titulo ?? '',
         sinopse: filmeEditando.sinopse ?? '',
         classificacao: filmeEditando.classificacao ?? '',
-        duracaoMinutos: '',
+        duracaoMinutos: getMinutesFromDate(filmeEditando.duracao),
         genero: filmeEditando.genero ?? '',
         cinemaId: String((filmeEditando as any).cinemaId ?? ''),
         dataInicioExibicao: filmeEditando.dataInicioExibicao

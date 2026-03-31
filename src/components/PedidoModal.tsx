@@ -4,8 +4,8 @@ import { createPedido, getLancheCombos as getLanches, api } from '@/services/api
 import { useAuth } from '@/contexts/AuthContext';
 
 interface SessaoInfo {
-  id: number;
-  horarioExibicao: string;
+  id?: number;
+  horarioExibicao?: string | Date;
   filme?: { titulo: string };
   sala?: { numero: number };
 }

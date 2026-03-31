@@ -69,8 +69,11 @@ const SessoesList = ({ sessoes, onDelete, onEdit }: SessoesListProps) => {
     setModalOpen(true);
   };
 
-  const formatDateTime = (dateStr: string) => {
+  const formatDateTime = (dateStr: string | Date | undefined) => {
+    if (!dateStr) return 'Data não disponível';
     const date = new Date(dateStr);
+    if (isNaN(date.getTime())) return 'Data Inválida';
+    
     return date.toLocaleString('pt-BR', {
       day: '2-digit',
       month: '2-digit',
@@ -78,6 +81,23 @@ const SessoesList = ({ sessoes, onDelete, onEdit }: SessoesListProps) => {
       hour: '2-digit',
       minute: '2-digit',
     });
+  };
+
+  const formatDuration = (duracao: string | number | Date | undefined) => {
+    if (!duracao) return '0';
+    if (typeof duracao === 'number') return String(duracao);
+    
+    try {
+      const date = new Date(duracao);
+      if (isNaN(date.getTime())) return String(duracao);
+      
+      // A duração é salva como 1970-01-01THH:mm:ss.000Z
+      const hours = date.getUTCHours();
+      const minutes = date.getUTCMinutes();
+      return String(hours * 60 + minutes);
+    } catch {
+      return String(duracao);
+    }
   };
 
   if (sessoes.length === 0) {
@@ -119,7 +139,7 @@ const SessoesList = ({ sessoes, onDelete, onEdit }: SessoesListProps) => {
                   </span>
                   {sessao.filme && (
                     <small className="d-block text-secondary">
-                      {sessao.filme.genero} • {sessao.filme.duracao} min
+                      {sessao.filme.genero} • {formatDuration(sessao.filme.duracao)} min
                     </small>
                   )}
                 </td>
@@ -135,7 +155,7 @@ const SessoesList = ({ sessoes, onDelete, onEdit }: SessoesListProps) => {
                 </td>
                 <td>
                   <i className="bi bi-clock me-1 text-warning"></i>
-                  {formatDateTime(sessao.dataHora)}
+                  {formatDateTime(sessao.horarioExibicao || sessao.dataHora)}
                 </td>
                 <td className="text-end">
                   <div className="btn-group gap-1">
